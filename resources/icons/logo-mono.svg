@@ -1,0 +1,27 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="128" height="128" rx="24" fill="currentColor" opacity="0.05"/>
+  
+  <!-- 主要 M 字形 -->
+  <path d="M32 40 
+           L48 40 
+           L64 64 
+           L80 40 
+           L96 40 
+           L96 88 
+           L84 88 
+           L84 56 
+           L64 84 
+           L44 56 
+           L44 88 
+           L32 88 Z" 
+        fill="currentColor"/>
+  
+  <!-- 流动效果装饰 -->
+  <path d="M32 72 
+           Q64 72 96 72" 
+        stroke="currentColor" 
+        stroke-width="4" 
+        fill="none" 
+        stroke-linecap="round"/>
+</svg> 
