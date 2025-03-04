@@ -270,15 +270,11 @@ def handle_push():
                                      capture_output=True, text=True).stdout.strip()
         print(f"正在推送分支 '{current_branch}' 到远程仓库...")
         
-        # 先尝试拉取最新代码
-        print("正在拉取远程更新...")
-        pull_result = subprocess.run(['git', 'pull', '--rebase', 'origin', current_branch], 
-                                   capture_output=True, text=True)
+        # 直接尝试推送到远程，设置上游分支
+        push_result = execute_git_command(['push', '--set-upstream', 'origin', current_branch])
         
-        if pull_result.returncode == 0:
-            print("成功拉取远程更新")
-            # 然后推送
-            execute_git_command(['push'])
+        if push_result:
+            print(f"成功推送分支 '{current_branch}' 到远程仓库")
             
             # 如果之前选择了储藏更改，现在恢复它们
             if choice == "2":
@@ -286,16 +282,13 @@ def handle_push():
                 execute_git_command(['stash', 'pop'])
                 print("如果有冲突，请手动解决后提交")
         else:
-            print("拉取远程更新失败，可能需要手动解决冲突")
-            print("建议按以下步骤操作：")
-            print("1. 使用 'git pull' 手动拉取更新")
-            print("2. 解决可能的冲突")
-            print("3. 重新尝试推送")
-            print("\n详细错误信息：")
-            if pull_result.stdout:
-                print(pull_result.stdout)
-            if pull_result.stderr:
-                print(pull_result.stderr)
+            print("推送失败，请检查以下可能的原因：")
+            print("1. 远程仓库是否已配置")
+            print("2. 是否有推送权限")
+            print("3. 网络连接是否正常")
+            print("\n可以使用以下命令检查远程仓库配置：")
+            print("选择选项 8 (git remote) 然后选择 1 查看远程仓库配置")
+            
     except Exception as e:
         print(f"推送失败: {str(e)}")
 
