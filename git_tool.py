@@ -30,38 +30,58 @@ def execute_git_command(command):
         if result.stderr:
             # 检查是否是首次推送的错误
             if "no upstream branch" in result.stderr:
-                print("首次推送分支，需要设置上游分支...")
+                print("首次推送分支，正在设置上游分支...")
                 current_branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], 
                                              capture_output=True, 
                                              text=True,
                                              encoding='utf-8',
                                              errors='replace',
                                              env=env).stdout.strip()
-                subprocess.run(['git', 'push', '--set-upstream', 'origin', current_branch],
-                            env=env)
+                # 使用 --set-upstream 选项设置上游分支
+                push_result = subprocess.run(['git', 'push', '--set-upstream', 'origin', current_branch],
+                                          capture_output=True,
+                                          text=True,
+                                          encoding='utf-8',
+                                          errors='replace',
+                                          env=env)
+                if push_result.stdout:
+                    print(push_result.stdout)
+                if push_result.stderr:
+                    print(push_result.stderr)
             else:
                 print(result.stderr)
+        return result.returncode == 0
     except Exception as e:
         print(f"执行出错: {str(e)}")
+        return False
 
 def show_menu():
     """
-    显示主菜单选项
+    显示分组后的主菜单选项
     """
-    print("\n=== Git 命令行工具 ===")
+    print("\n====== Git 命令行工具 ======")
+    print("\n[基础操作]")
     print("1. git status - 查看仓库状态")
-    print("2. git add - 添加文件到暂存区")
+    print("2. git add    - 添加文件到暂存区")
     print("3. git commit - 提交更改")
-    print("4. git push - 推送到远程仓库")
-    print("5. git pull - 拉取远程更新")
-    print("6. git log - 查看提交历史")
-    print("7. git branch - 分支操作")
-    print("8. git checkout - 切换分支")
-    print("9. git clone - 克隆远程仓库")
-    print("10. git config - 配置Git信息")
-    print("11. git remote - 管理远程仓库")
-    print("0. 退出")
-    print("==================")
+    print("4. git log    - 查看提交历史")
+    
+    print("\n[远程仓库操作]")
+    print("5. git push   - 推送到远程仓库")
+    print("6. git pull   - 拉取远程更新")
+    print("7. git clone  - 克隆远程仓库")
+    print("8. git remote - 管理远程仓库")
+    
+    print("\n[分支管理]")
+    print("9.  git branch   - 分支操作")
+    print("10. git checkout - 切换分支")
+    
+    print("\n[配置管理]")
+    print("11. git config - 配置Git信息")
+    
+    print("\n[其他]")
+    print("0. 退出程序")
+    print("\n=========================")
 
 def handle_add():
     """
@@ -212,8 +232,39 @@ def handle_remote():
 def handle_push():
     """
     处理git push命令
+    - 检查是否有未提交的更改
+    - 提供处理未提交更改的选项
+    - 执行推送操作
     """
     try:
+        # 检查是否有未提交的更改
+        status_result = subprocess.run(['git', 'status', '--porcelain'], 
+                                    capture_output=True, text=True)
+        
+        if status_result.stdout.strip():
+            print("\n检测到未提交的更改！请选择处理方式：")
+            print("1. 暂存并提交更改")
+            print("2. 暂时储藏更改(stash)")
+            print("3. 取消操作")
+            
+            choice = input("请选择 (1-3): ")
+            
+            if choice == "1":
+                # 暂存并提交
+                execute_git_command(['add', '.'])
+                commit_msg = input("请输入提交信息: ")
+                execute_git_command(['commit', '-m', commit_msg])
+            elif choice == "2":
+                # 储藏更改
+                print("储藏当前更改...")
+                execute_git_command(['stash'])
+            elif choice == "3":
+                print("操作已取消")
+                return
+            else:
+                print("无效的选择")
+                return
+
         # 获取当前分支名
         current_branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], 
                                      capture_output=True, text=True).stdout.strip()
@@ -228,6 +279,12 @@ def handle_push():
             print("成功拉取远程更新")
             # 然后推送
             execute_git_command(['push'])
+            
+            # 如果之前选择了储藏更改，现在恢复它们
+            if choice == "2":
+                print("恢复储藏的更改...")
+                execute_git_command(['stash', 'pop'])
+                print("如果有冲突，请手动解决后提交")
         else:
             print("拉取远程更新失败，可能需要手动解决冲突")
             print("建议按以下步骤操作：")
@@ -313,36 +370,45 @@ def main():
     """
     while True:
         show_menu()
-        choice = input("请选择操作 (0-11): ")
+        choice = input("\n请选择操作 (0-11): ")
         
-        if choice == "0":
-            print("感谢使用，再见！")
-            sys.exit(0)
-        elif choice == "1":
+        # 基础操作
+        if choice == "1":
             execute_git_command(['status'])
         elif choice == "2":
             handle_add()
         elif choice == "3":
             handle_commit()
         elif choice == "4":
-            handle_push()
-        elif choice == "5":
-            handle_pull()
-        elif choice == "6":
             execute_git_command(['log', '--oneline'])
+        
+        # 远程仓库操作
+        elif choice == "5":
+            handle_push()
+        elif choice == "6":
+            handle_pull()
         elif choice == "7":
-            handle_branch()
+            handle_clone()
         elif choice == "8":
+            handle_remote()
+        
+        # 分支管理
+        elif choice == "9":
+            handle_branch()
+        elif choice == "10":
             branch_name = input("请输入要切换的分支名称: ")
             execute_git_command(['checkout', branch_name])
-        elif choice == "9":
-            handle_clone()
-        elif choice == "10":
-            handle_config()
+        
+        # 配置管理
         elif choice == "11":
-            handle_remote()
+            handle_config()
+        
+        # 退出
+        elif choice == "0":
+            print("\n感谢使用，再见！")
+            sys.exit(0)
         else:
-            print("无效的选择，请重试")
+            print("\n无效的选择，请重试")
 
 if __name__ == "__main__":
     main() 

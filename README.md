@@ -2,9 +2,9 @@
 
 基于 [doocs/md](https://github.com/doocs/md) 二次开发的桌面版微信 Markdown 编辑器。
 
-![image](https://github.com/user-attachments/assets/684d128d-d49c-4b70-8127-6590f3047796)
+<img width="1680" alt="Windows版" src="https://github.com/user-attachments/assets/684d128d-d49c-4b70-8127-6590f3047796" />
 
-<img width="1680" alt="截屏2025-03-04 下午1 00 16" src="https://github.com/user-attachments/assets/7eb70a43-185d-4891-a05d-de930ed9fee5" />
+<img width="1680" alt="macOS版" src="https://github.com/user-attachments/assets/7eb70a43-185d-4891-a05d-de930ed9fee5" />
 
 
 ## 项目介绍
