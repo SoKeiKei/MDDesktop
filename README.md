@@ -4,6 +4,9 @@
 
 ![image](https://github.com/user-attachments/assets/684d128d-d49c-4b70-8127-6590f3047796)
 
+<img width="1680" alt="截屏2025-03-04 下午1 00 16" src="https://github.com/user-attachments/assets/7eb70a43-185d-4891-a05d-de930ed9fee5" />
+
+
 ## 项目介绍
 
 本项目在保持原有 Web 版本全部功能的基础上，使用 Electron 封装了桌面应用版本。
