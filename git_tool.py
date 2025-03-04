@@ -102,19 +102,46 @@ def handle_add():
 def handle_commit():
     """
     处理git commit命令
+    - 支持正常提交和跳过检查提交
+    - 提交失败时提供重试选项
     """
-    print("\n=== Git Commit ===")
-    print("1. 正常提交")
-    print("2. 跳过检查提交 (--no-verify)")
-    choice = input("请选择 (1/2): ")
-    
-    commit_message = input("\n请输入提交信息: ")
-    if choice == "1":
-        execute_git_command(['commit', '-m', commit_message])
-    elif choice == "2":
-        execute_git_command(['commit', '-m', commit_message, '--no-verify'])
-    else:
-        print("无效的选择")
+    while True:
+        print("\n=== Git Commit ===")
+        print("1. 正常提交")
+        print("2. 跳过检查提交 (--no-verify)")
+        print("3. 返回上级菜单")
+        choice = input("请选择 (1/2/3): ")
+        
+        if choice == "3":
+            return False
+            
+        if choice in ["1", "2"]:
+            commit_message = input("\n请输入提交信息: ")
+            if choice == "1":
+                result = execute_git_command(['commit', '-m', commit_message])
+            else:
+                result = execute_git_command(['commit', '-m', commit_message, '--no-verify'])
+                
+            if result:
+                print("提交成功！")
+                return True
+            else:
+                print("\n提交失败！请选择：")
+                print("1. 使用 --no-verify 重试")
+                print("2. 重新输入信息")
+                print("3. 返回上级菜单")
+                retry = input("请选择 (1/2/3): ")
+                
+                if retry == "1":
+                    if execute_git_command(['commit', '-m', commit_message, '--no-verify']):
+                        print("提交成功！")
+                        return True
+                elif retry == "2":
+                    continue
+                else:
+                    return False
+        else:
+            print("无效的选择")
 
 def handle_branch():
     """
@@ -244,21 +271,33 @@ def handle_push():
         if status_result.stdout.strip():
             print("\n检测到未提交的更改！请选择处理方式：")
             print("1. 暂存并提交更改")
-            print("2. 暂时储藏更改(stash)")
-            print("3. 取消操作")
+            print("2. 暂存并提交更改 (跳过检查)")
+            print("3. 暂时储藏更改(stash)")
+            print("4. 取消操作")
             
-            choice = input("请选择 (1-3): ")
+            choice = input("请选择 (1-4): ")
             
             if choice == "1":
-                # 暂存并提交
+                # 暂存并正常提交
                 execute_git_command(['add', '.'])
                 commit_msg = input("请输入提交信息: ")
-                execute_git_command(['commit', '-m', commit_msg])
+                if not execute_git_command(['commit', '-m', commit_msg]):
+                    print("\n正常提交失败，是否尝试跳过检查提交？(y/n): ")
+                    if input().lower() == 'y':
+                        execute_git_command(['commit', '-m', commit_msg, '--no-verify'])
+                    else:
+                        print("操作已取消")
+                        return
             elif choice == "2":
+                # 暂存并跳过检查提交
+                execute_git_command(['add', '.'])
+                commit_msg = input("请输入提交信息: ")
+                execute_git_command(['commit', '-m', commit_msg, '--no-verify'])
+            elif choice == "3":
                 # 储藏更改
                 print("储藏当前更改...")
                 execute_git_command(['stash'])
-            elif choice == "3":
+            elif choice == "4":
                 print("操作已取消")
                 return
             else:
@@ -277,7 +316,7 @@ def handle_push():
             print(f"成功推送分支 '{current_branch}' 到远程仓库")
             
             # 如果之前选择了储藏更改，现在恢复它们
-            if choice == "2":
+            if choice == "3":
                 print("恢复储藏的更改...")
                 execute_git_command(['stash', 'pop'])
                 print("如果有冲突，请手动解决后提交")
