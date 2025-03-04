@@ -12,8 +12,19 @@ def execute_git_command(command):
     - 特殊处理首次推送分支的情况
     """
     try:
-        # subprocess.run执行命令，capture_output捕获输出，text=True确保输出为字符串
-        result = subprocess.run(['git'] + command, capture_output=True, text=True)
+        # 添加环境变量设置来强制使用 UTF-8 编码
+        env = os.environ.copy()
+        env['PYTHONIOENCODING'] = 'utf-8'
+        env['LANG'] = 'en_US.UTF-8'
+        
+        # 添加 encoding 参数并使用环境变量
+        result = subprocess.run(['git'] + command, 
+                             capture_output=True, 
+                             text=True,
+                             encoding='utf-8',
+                             errors='replace',
+                             env=env)
+        
         if result.stdout:
             print(result.stdout)
         if result.stderr:
@@ -21,8 +32,13 @@ def execute_git_command(command):
             if "no upstream branch" in result.stderr:
                 print("首次推送分支，需要设置上游分支...")
                 current_branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], 
-                                             capture_output=True, text=True).stdout.strip()
-                subprocess.run(['git', 'push', '--set-upstream', 'origin', current_branch])
+                                             capture_output=True, 
+                                             text=True,
+                                             encoding='utf-8',
+                                             errors='replace',
+                                             env=env).stdout.strip()
+                subprocess.run(['git', 'push', '--set-upstream', 'origin', current_branch],
+                            env=env)
             else:
                 print(result.stderr)
     except Exception as e:
@@ -67,8 +83,18 @@ def handle_commit():
     """
     处理git commit命令
     """
+    print("\n=== Git Commit ===")
+    print("1. 正常提交")
+    print("2. 跳过检查提交 (--no-verify)")
+    choice = input("请选择 (1/2): ")
+    
     commit_message = input("\n请输入提交信息: ")
-    execute_git_command(['commit', '-m', commit_message])
+    if choice == "1":
+        execute_git_command(['commit', '-m', commit_message])
+    elif choice == "2":
+        execute_git_command(['commit', '-m', commit_message, '--no-verify'])
+    else:
+        print("无效的选择")
 
 def handle_branch():
     """

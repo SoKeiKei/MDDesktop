@@ -10,6 +10,7 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -56,3 +57,32 @@ components.d.ts
 .wxt
 .output
 web-ext.config.ts
+
+# 在现有的 .gitignore 中添加
+/release
+/dist-electron
+
+# 确保保留资源文件
+!/resources/icons/*
+
+# Electron
+/release
+/dist-electron
+/release/win-unpacked
+
+# Resources
+/resources/*
+!/resources/icons/
+/resources/icons/*
+!/resources/icons/icon.svg
+!/resources/icons/icon-128.png
+
+# Stats
+stats.html
+
+# Cache
+.cache
+.temp
+
+git_helper.py
+git_tool.py

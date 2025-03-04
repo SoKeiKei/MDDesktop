@@ -12,7 +12,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: process.env.SERVER_ENV === `NETLIFY` ? `/` : `/md/`, // 基本路径, 建议以绝对路径跟随访问目录
+  base: process.env.NODE_ENV === 'production' ? './' : '/',
   define: {
     process,
   },
@@ -55,12 +55,17 @@ export default defineConfig({
     devSourcemap: true,
   },
   build: {
+    outDir: 'dist',
+    assetsDir: 'static',
+    emptyOutDir: true,
     rollupOptions: {
       output: {
-        chunkFileNames: `static/js/md-[name]-[hash].js`,
-        entryFileNames: `static/js/md-[name]-[hash].js`,
-        assetFileNames: `static/[ext]/md-[name]-[hash].[ext]`,
-      },
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor'
+          }
+        }
+      }
     },
   },
 })

@@ -1,7 +1,12 @@
 {
   "name": "md",
   "type": "module",
-  "version": "1.6.0",
+  "version": "1.0.0",
+  "description": "基于 doocs/md 二次开发的桌面版微信 Markdown 编辑器",
+  "author": {
+    "name": "KeiKo",
+    "email": "sogei@vip.qq.com"
+  },
   "private": false,
   "scripts": {
     "start": "npm run dev",
@@ -20,7 +25,9 @@
     "firefox:zip": "wxt zip -b firefox",
     "lint": "eslint . --fix",
     "type-check": "vue-tsc --build --force",
-    "postinstall": "simple-git-hooks && wxt prepare"
+    "postinstall": "simple-git-hooks && wxt prepare",
+    "electron:dev": "cross-env NODE_ENV=development concurrently \"vite\" \"wait-on http://localhost:5173 && electron electron/main.cjs\"",
+    "electron:build": "vite build && electron-builder"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.733.0",
@@ -70,7 +77,10 @@
     "@unocss/eslint-plugin": "^0.64.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
+    "electron": "^29.4.6",
+    "electron-builder": "^24.13.3",
     "eslint": "^9.15.0",
     "eslint-plugin-format": "^0.1.2",
     "less": "^4.2.2",
@@ -89,6 +99,7 @@
     "vite-plugin-node-polyfills": "^0.23.0",
     "vite-plugin-vue-devtools": "^7.6.5",
     "vue-tsc": "^2.2.0",
+    "wait-on": "^8.0.2",
     "wxt": "^0.19.25"
   },
   "simple-git-hooks": {
@@ -96,5 +107,39 @@
   },
   "lint-staged": {
     "*": "npm run lint"
+  },
+  "build": {
+    "appId": "com.doocs.md",
+    "productName": "MD Desktop",
+    "asar": true,
+    "icon": "resources/icons/icon.ico",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "extraMetadata": {
+      "main": "electron/main.cjs"
+    },
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
   }
 }

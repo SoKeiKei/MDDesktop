@@ -8,7 +8,8 @@ import {
 } from '@/config'
 import { useStore } from '@/stores'
 import { addPrefix, processClipboardContent } from '@/utils'
-import { ChevronDownIcon, Moon, PanelLeftClose, PanelLeftOpen, Settings, Sun } from 'lucide-vue-next'
+import { ChevronDownIcon, Moon, PanelLeftClose, PanelLeftOpen, Settings, Sun, Info } from 'lucide-vue-next'
+import AboutDialog from './AboutDialog.vue'
 
 const emit = defineEmits([`addFormat`, `formatContent`, `startCopy`, `endCopy`])
 
@@ -54,6 +55,12 @@ const { toggleDark, editorRefresh, citeStatusChanged, countStatusChanged } = sto
 const copyMode = useStorage(addPrefix(`copyMode`), `txt`)
 const source = ref(``)
 const { copy: copyContent } = useClipboard({ source })
+
+const visible = ref(false)
+
+function handleAboutClick() {
+  visible.value = true
+}
 
 // 复制到微信公众号
 function copy() {
@@ -194,8 +201,11 @@ function copy() {
         <Settings class="size-4" />
       </Button>
 
+
       <Toaster rich-colors position="top-center" />
     </div>
+
+    <AboutDialog :visible="visible" @close="visible = false" />
   </header>
 </template>
 
