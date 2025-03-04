@@ -58,7 +58,7 @@ Windows 版本构建：
 npm run electron:build
 ```
 
-macOS 版本构建 （未验证可用性）：
+macOS 版本构建 ：
 ```bash
 # 需要在 macOS 系统上执行
 npm run electron:build -- --mac
@@ -78,7 +78,7 @@ npm run electron:build -- --linux deb rpm
 
 构建产物将输出到 `release` 目录：
 - Windows: `MD Desktop-1.0.0-win-x64.exe`
-- macOS: `MD Desktop-1.0.0-mac-x64.dmg` (Intel) / `MD Desktop-1.0.0-mac-arm64.dmg` (Apple Silicon)
+- macOS: `MD.Desktop-1.0.0-universal.dmg`
 - Linux: `MD Desktop-1.0.0-linux-x64.AppImage`
 
 > 注意：跨平台构建可能会遇到一些限制，建议在目标平台上进行构建。
