@@ -94,7 +94,7 @@ npm run electron:build -- --linux deb rpm
 
 ## 使用说明
 
-1. 下载对应平台的安装包
+1. [下载对应平台的安装包](https://github.com/SoKeiKei/MDDesktop/releases/tag/v1.0.0) 
 2. 安装并运行应用
 3. 开始使用 Markdown 编辑器
 
