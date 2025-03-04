@@ -2,6 +2,8 @@
 
 基于 [doocs/md](https://github.com/doocs/md) 二次开发的桌面版微信 Markdown 编辑器。
 
+![image](https://github.com/user-attachments/assets/684d128d-d49c-4b70-8127-6590f3047796)
+
 ## 项目介绍
 
 本项目在保持原有 Web 版本全部功能的基础上，使用 Electron 封装了桌面应用版本。
