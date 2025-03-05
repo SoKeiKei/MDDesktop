@@ -12,6 +12,11 @@
 
 - 如需无任何功能修改的原版 MD Desktop，请前往 [main 分支获取 v1.0.0 版本](https://github.com/SoKeiKei/MDDesktop/tree/main)
 - dev 分支从 v1.1.0 开始，对原版功能进行二次开发和增强
+- **从 v1.1.0 开始不再支持单独运行 Web 版本**，原因如下：
+  - 新增的本地目录导入功能依赖 Electron 的文件系统 API
+  - 智能目录过滤功能需要 Node.js 环境支持
+  - 文件系统操作相关功能与桌面应用深度集成
+  - 移除了部分纯 Web 环境的兼容代码以优化性能
 
 ## 项目介绍
 
@@ -63,39 +68,35 @@ npm install
 ### 开发模式
 
 ```bash
-# 启动开发服务
+# 启动桌面应用开发模式
 npm run electron:dev
 ```
+
+> 注意：本项目已不支持单独运行 Web 版本，必须通过 electron:dev 启动完整的桌面应用进行开发。
 
 ### 构建应用
 
 Windows 版本构建：
 ```bash
 # 构建桌面应用
-npm run electron:build
+npm run electron:build:win
 ```
 
 macOS 版本构建：
 ```bash
 # 需要在 macOS 系统上执行
-npm run electron:build -- --mac
-
-# 如果需要同时构建 Intel 和 Apple Silicon 版本
-npm run electron:build -- --mac --universal
+npm run electron:build:mac
 ```
 
-Linux 版本构建 （未验证可用性）：
+Linux 版本构建：
 ```bash
 # 在 Linux 系统上执行
-npm run electron:build -- --linux
-
-# 支持的格式：AppImage, snap, deb, rpm
-npm run electron:build -- --linux deb rpm
+npm run electron:build:linux
 ```
 
 构建产物将输出到 `release` 目录：
 - Windows: `MD Desktop-1.1.0-win-x64.exe`
-- macOS: `MD.Desktop-1.1.0-universal.dmg`
+- macOS: `MD.Desktop-1.1.0.dmg`
 - Linux: `MD Desktop-1.1.0-linux-x64.AppImage`
 
 > 注意：跨平台构建可能会遇到一些限制，建议在目标平台上进行构建。
@@ -104,7 +105,8 @@ npm run electron:build -- --linux deb rpm
 
 ```
 ├── electron/          # Electron 相关代码
-│   └── main.cjs      # 主进程入口
+│   ├── main.ts       # 主进程入口
+│   └── preload.ts    # 预加载脚本
 ├── src/              # Web 应用源码
 │   ├── components/   # Vue 组件
 │   ├── stores/       # Pinia 状态管理
@@ -134,6 +136,7 @@ macOS 用户首次运行可能需要在"系统偏好设置"中允许来自身份
 - 完善深色模式适配
 - 添加面板拖拽调整功能
 - 修复已知问题
+- 移除 Web 版本独立运行支持
 
 ### v1.0.0 (2025-03-04)
 - 首次发布
