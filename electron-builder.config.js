@@ -22,7 +22,16 @@ module.exports = {
   mac: {
     icon: 'resources/icons/icon.icns',
     category: 'public.app-category.productivity',
-    target: ['dmg', 'zip']
+    target: ['dmg', 'zip'],
+    electronDist: 'dist',
+    darkModeSupport: true,
+    extendInfo: {
+      CFBundleIconFile: 'icon.icns',
+      NSHighResolutionCapable: true,
+      LSEnvironment: {
+        ELECTRON_ICON_SIZE: '128'
+      }
+    }
   },
   win: {
     icon: 'resources/icons/icon.ico',

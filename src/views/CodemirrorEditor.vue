@@ -9,9 +9,12 @@ import {
 } from '@/utils'
 import fileApi from '@/utils/file'
 import CodeMirror from 'codemirror'
+import { useLocalDirectoryStore } from '@/stores/useLocalDirectoryStore'
 
 const store = useStore()
 const displayStore = useDisplayStore()
+const localDirStore = useLocalDirectoryStore()
+const { state: localState } = storeToRefs(localDirStore)
 const { isDark, output, editor, readingTime } = storeToRefs(store)
 
 const {
@@ -32,6 +35,29 @@ const isImgLoading = ref(false)
 const timeout = ref<ReturnType<typeof setTimeout> | null>(null)
 
 const preview = ref<HTMLDivElement | null>(null)
+
+// 获取当前文件路径
+const currentFilePath = computed(() => {
+  const currentPost = store.posts[store.currentPostIndex]
+  return 'path' in currentPost ? currentPost.path : null
+})
+
+// 获取完整路径显示
+const fullPath = computed(() => {
+  const basePath = localState.value?.currentDir || ''
+  const filePath = currentFilePath.value
+  
+  if (!basePath) return '未选择目录'
+  
+  if (filePath) {
+    // 如果有打开的文件，显示完整路径 + 文件名
+    const fileName = typeof filePath === 'string' ? filePath.split('/').pop() : ''
+    return `${basePath}${basePath.endsWith('/') ? '' : '/'}${fileName}`
+  }
+  
+  // 否则只显示目录路径
+  return basePath
+})
 
 // 使浏览区与编辑区滚动条建立同步联系
 function leftAndRightScroll() {
@@ -436,8 +462,13 @@ onMounted(() => {
         <CssEditor class="order-2 flex-1" />
         <RightSlider class="order-2" />
       </div>
-      <footer class="h-[30px] flex select-none items-center justify-end px-4 text-[12px]">
-        字数 {{ readingTime?.words }}， 阅读大约需 {{ Math.ceil(readingTime?.minutes ?? 0) }} 分钟
+      <footer class="h-[30px] flex select-none items-center justify-between px-4 text-[12px]">
+        <div class="text-gray-500 dark:text-gray-400 truncate flex-1 min-w-0 pr-4">
+          {{ fullPath }}
+        </div>
+        <div class="flex-shrink-0">
+          字数 {{ readingTime?.words }}， 阅读大约需 {{ Math.ceil(readingTime?.minutes ?? 0) }} 分钟
+        </div>
       </footer>
 
       <UploadImgDialog @upload-image="uploadImage" />

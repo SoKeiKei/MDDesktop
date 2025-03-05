@@ -31,11 +31,13 @@ if (import.meta.env.DEV) {
 const expandedDirs = ref(new Map<string, boolean>())
 
 // 添加路径处理工具函数
-function normalizePath(path: string) {
+function normalizePath(path: string | undefined): string {
+  if (!path) return ''
+  // 统一将所有路径分隔符转换为正斜杠
   return path.replace(/\\/g, '/')
 }
 
-function getParentPath(path: string) {
+function getParentPath(path: string): string {
   const normalized = normalizePath(path)
   return normalized.substring(0, normalized.lastIndexOf('/'))
 }
@@ -85,7 +87,6 @@ const directories = computed(() => {
 
 // 获取目录下的内容（包括子目录和文件）
 function getDirectoryContents(dirPath: string) {
-  // 只在开发环境下输出一次目录内容的日志
   if (import.meta.env.DEV) {
     console.debug('Getting contents for directory:', dirPath)
   }
@@ -93,15 +94,16 @@ function getDirectoryContents(dirPath: string) {
   return (state.value?.localFiles || []).filter(f => {
     if (!f) return false
     
-    const parentDir = f.path.substring(0, f.path.lastIndexOf('\\')).replace(/\\/g, '/')
-    const targetDir = dirPath.replace(/\\/g, '/')
+    // 规范化路径
+    const filePath = normalizePath(f.path)
+    const parentDir = filePath.substring(0, filePath.lastIndexOf('/'))
+    const targetDir = normalizePath(dirPath)
     
     const isDirectChild = parentDir === targetDir
     
-    // 只在开发环境且需要调试具体文件时才输出
     if (import.meta.env.DEV && false) { // 设置为 true 开启详细日志
       console.debug('Content check:', {
-        file: f.path,
+        file: filePath,
         parentDir,
         targetDir,
         isDirectChild
@@ -161,6 +163,15 @@ const currentFilePath = computed(() => {
 // 检查文件是否为当前打开的文件
 function isCurrentFile(file: LocalFile): boolean {
   return file.path === currentFilePath.value
+}
+
+// 修改 formatPath 函数
+function formatPath(path: string): string {
+  if (!path) return ''
+  const normalized = normalizePath(path)
+  const parts = normalized.split('/')
+  if (parts.length < 4) return normalized
+  return `${parts[0]}/.../${parts[parts.length - 1]}`
 }
 </script>
 

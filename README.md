@@ -32,23 +32,11 @@
   - 自定义主题和 CSS 样式
   - 多图床上传支持
   - 文档导入导出
-  - 本地内容管理
 
-- v1.1.0 新增功能:
-  - 增加本地目录导入功能
-  - 智能目录过滤（类似 .gitignore）
-  - 目录树层级显示优化
-  - 文件名称完整显示（Tooltip）
-  - 当前打开文件高亮
-  - 可拖动调整内存文档面板高度
-  - 文件导入编辑器功能增强
-
-  >原版内容管理功能保留，调整了样式折叠在侧边栏左下角
 
 - 桌面版增强:
+  - 本地目录导入管理
   - 独立窗口应用
-  - 更大的编辑区域(1920x1080)
-  - 简洁的界面布局
   - 无需浏览器即可使用
 
 ## 开发说明
@@ -95,9 +83,9 @@ npm run electron:build:linux
 ```
 
 构建产物将输出到 `release` 目录：
-- Windows: `MD Desktop-1.1.0-win-x64.exe`
-- macOS: `MD.Desktop-1.1.0.dmg`
-- Linux: `MD Desktop-1.1.0-linux-x64.AppImage`
+- Windows: `MD Desktop-1.1.1-win-x64.exe`
+- macOS: `MD.Desktop-1.1.1.dmg`
+- Linux: `MD Desktop-1.1.1-linux-x64.AppImage`
 
 > 注意：跨平台构建可能会遇到一些限制，建议在目标平台上进行构建。
 
@@ -119,7 +107,7 @@ npm run electron:build:linux
 
 ## 使用说明
 
-1. [下载对应平台的安装包](https://github.com/SoKeiKei/MDDesktop/releases/tag/v1.1.0) 
+1. [下载对应平台的安装包](https://github.com/SoKeiKei/MDDesktop/releases/tag/v1.1.1) 
 2. 安装并运行应用
 3. 开始使用 Markdown 编辑器
 
@@ -129,7 +117,15 @@ macOS 用户首次运行可能需要在"系统偏好设置"中允许来自身份
 
 ## 更新日志
 
+### v1.1.1 (2025-03-07)
+- 优化文件路径显示方式
+- 改进目录树在 macOS 系统下的兼容性
+- 完善状态栏路径显示功能
+- 优化侧边栏界面布局
+- 修复其他已知问题
+
 ### v1.1.0 (2025-03-06)
+- 新增本地目录导入管理
 - 新增智能目录过滤功能
 - 优化目录树显示和交互
 - 改进文件导入编辑器功能

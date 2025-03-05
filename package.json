@@ -1,7 +1,7 @@
 {
   "name": "md",
   "type": "module",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "基于 doocs/md 二次开发的桌面版微信 Markdown 编辑器",
   "author": {
     "name": "KeiKo",

@@ -232,22 +232,8 @@ function formatPath(path: string): string {
         <!-- 文件管理头部 -->
         <div class="flex items-center justify-between px-3 py-2 border-b">
           <!-- 当前目录路径 -->
-          <div class="flex-1 min-w-0">
-            <div v-if="localState.currentDir" class="text-xs text-gray-500">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger class="truncate block">
-                    {{ formatPath(localState.currentDir) }}
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p class="text-xs">{{ localState.currentDir }}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <div v-else class="text-xs text-gray-400">
-              请选择目录
-            </div>
+          <div class="text-xs text-gray-500 dark:text-gray-400">
+            {{ localState.currentDir ? '已选择目录' : '请选择目录' }}
           </div>
           
           <!-- 切换目录按钮 -->
