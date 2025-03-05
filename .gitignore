@@ -86,3 +86,9 @@ stats.html
 
 git_helper.py
 git_tool.py
+
+.cursorrules
+
+/doc
+
+electron/dist/

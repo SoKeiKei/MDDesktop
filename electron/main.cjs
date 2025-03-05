@@ -22,7 +22,7 @@ function createWindow() {
   })
 
   // 隐藏默认菜单栏
-  mainWindow.setMenuBarVisibility(false)
+  mainWindow.setMenuBarVisibility(true)
   // 或者完全移除菜单栏
   mainWindow.removeMenu()
 

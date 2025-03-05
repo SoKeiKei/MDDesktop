@@ -1,59 +1,120 @@
-import { app, BrowserWindow } from 'electron'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-let mainWindow = null
-
-function createWindow() {
-  // 创建浏览器窗口
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
     }
-  })
-
-  // 加载应用
-  if (process.env.NODE_ENV === 'development') {
-    // 开发环境下加载本地服务
-    mainWindow.loadURL('http://localhost:5173').catch(err => {
-      console.error('Failed to load URL:', err)
-    })
-    // 打开开发工具
-    mainWindow.webContents.openDevTools()
-  } else {
-    // 生产环境下加载打包后的文件
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html')).catch(err => {
-      console.error('Failed to load file:', err)
-    })
-  }
-
-  // 窗口关闭时触发
-  mainWindow.on('closed', () => {
-    mainWindow = null
-  })
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const electron_1 = require("electron");
+const fs = __importStar(require("node:fs/promises"));
+const path = __importStar(require("node:path"));
+let mainWindow = null;
+async function createWindow() {
+    mainWindow = new electron_1.BrowserWindow({
+        width: 1200,
+        height: 800,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: true, // 确保这个是 true
+            preload: path.join(__dirname, '../preload.js') // 使用相对路径
+        }
+    });
+    if (process.env.NODE_ENV === 'development') {
+        await mainWindow.loadURL('http://localhost:5173');
+        mainWindow.webContents.openDevTools();
+    }
+    else {
+        await mainWindow.loadFile('dist/index.html');
+    }
+    mainWindow.on('ready-to-show', () => {
+        console.log('Window ready to show');
+        mainWindow?.show();
+    });
 }
-
-// 应用准备就绪时创建窗口
-app.whenReady().then(createWindow).catch(err => {
-  console.error('Failed to create window:', err)
-})
-
-// 所有窗口关闭时退出应用
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
-// 在 macOS 上,单击dock图标时没有已打开的其余应用窗口时,则新建应用窗口
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
-  }
-}) 
+// 等待应用准备就绪后再设置 IPC 处理器
+electron_1.app.whenReady().then(() => {
+    createWindow();
+    // 设置 IPC 处理器
+    electron_1.ipcMain.handle('showOpenDialog', async (event, options) => {
+        try {
+            if (!mainWindow)
+                throw new Error('Main window is not available');
+            const result = await electron_1.dialog.showOpenDialog(mainWindow, {
+                title: '选择目录',
+                properties: ['openDirectory'],
+                ...options
+            });
+            return result;
+        }
+        catch (error) {
+            console.error('Failed to show open dialog:', error);
+            throw error;
+        }
+    });
+    electron_1.ipcMain.handle('readDirectory', async (event, dirPath) => {
+        try {
+            const files = await fs.readdir(dirPath);
+            const fileInfos = await Promise.all(files.map(async (name) => {
+                const filePath = path.join(dirPath, name);
+                const stats = await fs.stat(filePath);
+                return {
+                    path: filePath,
+                    name,
+                    lastModified: stats.mtimeMs
+                };
+            }));
+            return fileInfos;
+        }
+        catch (error) {
+            console.error('Failed to read directory:', error);
+            throw error;
+        }
+    });
+    electron_1.ipcMain.handle('readFile', async (event, filePath) => {
+        try {
+            const content = await fs.readFile(filePath, 'utf-8');
+            return content;
+        }
+        catch (error) {
+            console.error('Failed to read file:', error);
+            throw error;
+        }
+    });
+    electron_1.ipcMain.handle('writeFile', async (event, filePath, content) => {
+        try {
+            await fs.writeFile(filePath, content, 'utf-8');
+        }
+        catch (error) {
+            console.error('Failed to write file:', error);
+            throw error;
+        }
+    });
+});
+electron_1.app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        electron_1.app.quit();
+    }
+});
+electron_1.app.on('activate', () => {
+    if (mainWindow === null) {
+        createWindow();
+    }
+});
