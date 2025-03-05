@@ -27,7 +27,7 @@
   - 独立窗口应用
   - 无需浏览器即可使用
 
-**本分支仅存放最初版本，功能增修版本(v1.1.0后)请前往[dev分支](https://github.com/SoKeiKei/MDDesktop/tree/dev) 查看
+**本分支仅存放最初版本，功能增修版本(v1.1.0后)请前往[dev分支](https://github.com/SoKeiKei/MDDesktop/tree/dev) 查看**
 
 ## 开发说明
 
