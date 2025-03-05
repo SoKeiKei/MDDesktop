@@ -29,7 +29,7 @@ const {
 } = displayStore
 
 const isImgLoading = ref(false)
-const timeout = ref<NodeJS.Timeout>()
+const timeout = ref<ReturnType<typeof setTimeout> | null>(null)
 
 const preview = ref<HTMLDivElement | null>(null)
 
@@ -39,7 +39,7 @@ function leftAndRightScroll() {
     let source: HTMLElement
     let target: HTMLElement
 
-    clearTimeout(timeout.value)
+    clearTimeout(timeout.value || undefined)
     if (text === `preview`) {
       source = preview.value!
       target = document.querySelector<HTMLElement>(`.CodeMirror-scroll`)!
@@ -161,7 +161,7 @@ function uploadImage(file: File, cb?: { (url: any): void, (arg0: unknown): void 
     })
 }
 
-const changeTimer = ref<NodeJS.Timeout>()
+const changeTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 
 // 监听暗色模式并更新编辑器
 watch(isDark, () => {
@@ -218,7 +218,7 @@ function initEditor() {
   })
 
   editor.value.on(`change`, (e) => {
-    clearTimeout(changeTimer.value)
+    clearTimeout(changeTimer.value || undefined)
     changeTimer.value = setTimeout(() => {
       onEditorRefresh()
       store.posts[store.currentPostIndex].content = e.getValue()

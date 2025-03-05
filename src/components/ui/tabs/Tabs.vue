@@ -3,7 +3,13 @@ import type { TabsRootEmits, TabsRootProps } from 'radix-vue'
 import { TabsRoot, useForwardPropsEmits } from 'radix-vue'
 import { watch, nextTick } from 'vue'
 
-const props = defineProps<TabsRootProps>()
+interface Props {
+  value?: string
+  defaultValue?: string
+  asChild?: boolean
+}
+
+const props = defineProps<Props>()
 const emits = defineEmits<{
   'update:value': [value: string]  // 明确声明事件类型
 }>()

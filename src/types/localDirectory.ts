@@ -21,6 +21,7 @@ export interface LocalFile {
   path: string
   name: string
   lastModified: number
+  isDirectory: boolean
 }
 
 /**
@@ -33,4 +34,11 @@ export interface LocalDirectoryState {
   recentDirs: LocalDirectory[]
   currentDir: string | null
   localFiles: LocalFile[]
+}
+
+export interface FileInfo {
+  path: string
+  name: string
+  isDirectory: boolean
+  lastModified: number
 } 

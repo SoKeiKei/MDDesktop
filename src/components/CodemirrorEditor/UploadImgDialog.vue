@@ -288,7 +288,7 @@ function onDrop(e: DragEvent) {
 
 <template>
   <Dialog v-model:open="displayStore.isShowUploadImgDialog">
-    <DialogContent class="max-w-max" @pointer-down-outside="ev => ev.preventDefault()">
+    <DialogContent class="max-w-max" @pointer-down-outside="(ev: PointerEvent) => ev.preventDefault()">
       <DialogHeader>
         <DialogTitle>本地上传</DialogTitle>
       </DialogHeader>

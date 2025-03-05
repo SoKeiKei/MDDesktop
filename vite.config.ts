@@ -33,14 +33,11 @@ export default defineConfig({
     }),
     AutoImport({
       imports: [
-        `vue`,
-        `pinia`,
-        `@vueuse/core`,
+        'vue',
+        'pinia',
+        '@vueuse/core'
       ],
-      dirs: [
-        `./src/stores`,
-        `./src/utils/toast`,
-      ],
+      dts: 'auto-imports.d.ts'
     }),
     Components({
       resolvers: [],

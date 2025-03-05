@@ -1,7 +1,7 @@
 {
   "name": "md",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "基于 doocs/md 二次开发的桌面版微信 Markdown 编辑器",
   "author": {
     "name": "KeiKo",
@@ -26,9 +26,14 @@
     "lint": "eslint . --fix",
     "type-check": "vue-tsc --build --force",
     "postinstall": "simple-git-hooks && wxt prepare",
-    "electron:dev": "cross-env NODE_ENV=development concurrently \"vite\" \"npm run electron:dev:compile\"",
+    "electron:dev": "cross-env NODE_ENV=development concurrently \"vite\" \"wait-on tcp:5173 && npm run electron:dev:compile\"",
     "electron:dev:compile": "rimraf electron/dist && tsc -p electron/tsconfig.json && node scripts/rename-electron-files.js && electron electron/dist/main.cjs",
-    "build:electron": "rimraf electron/dist && tsc -p electron/tsconfig.json && node scripts/rename-electron-files.js"
+    "electron:build": "vue-tsc --noEmit && vite build && npm run electron:build:compile",
+    "electron:build:compile": "rimraf electron/dist && tsc -p electron/tsconfig.json && node scripts/rename-electron-files.js",
+    "electron:package": "npm run electron:build && electron-builder",
+    "electron:build:win": "npm run electron:build && electron-builder --win",
+    "electron:build:mac": "npm run electron:build && electron-builder --mac",
+    "electron:build:linux": "npm run electron:build && electron-builder --linux"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.733.0",
@@ -101,7 +106,7 @@
     "vite-plugin-node-polyfills": "^0.23.0",
     "vite-plugin-vue-devtools": "^7.6.5",
     "vue-tsc": "^2.2.0",
-    "wait-on": "^8.0.2",
+    "wait-on": "^7.2.0",
     "wxt": "^0.19.25"
   },
   "simple-git-hooks": {
@@ -120,10 +125,10 @@
     },
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/dist/**/*"
     ],
     "extraMetadata": {
-      "main": "electron/main.cjs"
+      "main": "./electron/dist/main.cjs"
     },
     "mac": {
       "category": "public.app-category.productivity",
@@ -143,6 +148,12 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "resources/icons/icon.png"
     }
   }
 }

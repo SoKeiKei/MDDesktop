@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Post } from '@/types'
+import type { Post, PostAccount } from '@/types/post'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 const props = defineProps<{
@@ -17,6 +17,14 @@ const dialogVisible = computed({
 const taskStatus = ref<any>(null)
 const submitting = ref(false)
 
+// 使用可选链访问可选属性
+const taskData = {
+  markdown: props.post.markdown || '',
+  thumb: props.post.thumb || '',
+  desc: props.post.desc || '',
+  accounts: props.post.accounts?.filter((a: PostAccount) => a.checked) || []
+}
+
 async function startPost() {
   if (!props.post)
     return
@@ -31,7 +39,7 @@ async function startPost() {
           thumb: props.post.thumb,
           desc: props.post.desc,
         },
-        accounts: props.post.accounts.filter(a => a.checked),
+        accounts: props.post.accounts?.filter(a => a.checked) || [],
       },
       (newStatus: any) => {
         taskStatus.value = newStatus

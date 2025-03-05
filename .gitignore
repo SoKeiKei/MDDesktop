@@ -1,94 +1,97 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# production
-/build
-/dist
-
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-dist
-
-node_modules
-
-# Log files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Editor directories and files
-.idea
+# IDE and Editor files
+.idea/
+.vscode/
+.vs/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+.history/
+.cursorrules
 
-# mockm
-httpData
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+.yarn/
+.yarnrc
+.npm/
 
-public/upload/**
-!public/upload/*.gitkeep
-.history
+# Build and Output
+/dist/
+/dist-electron/
+/build/
+/release/
+/out/
+/coverage/
+/stats.html
+.output/
+.nuxt/
+.next/
+.wxt/
 
-# Package manager lock file
+# Cache and Temp
+.cache/
+.temp/
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Package Manager Lock Files
 # package-lock.json
 yarn.lock
 pnpm-lock.yaml
-auto-imports.d.ts
+
+# Auto Generated Files
 components.d.ts
+*.d.ts.map
 
-.wxt
-.output
-web-ext.config.ts
+# Electron specific
+/electron/dist/
+/release/win-unpacked/
 
-# 在现有的 .gitignore 中添加
-/release
-/dist-electron
+# Project specific
+/doc/
+/httpData/
+/public/upload/**
+!public/upload/*.gitkeep
 
-# 确保保留资源文件
-!/resources/icons/*
-
-# Electron
-/release
-/dist-electron
-/release/win-unpacked
-
-# Resources
-/resources/*
-!/resources/icons/
-/resources/icons/*
-!/resources/icons/icon.svg
-!/resources/icons/icon-128.png
-
-# Stats
-stats.html
-
-# Cache
-.cache
-.temp
-
+# Development Tools
 git_helper.py
 git_tool.py
+*.pyc
+__pycache__/
 
-.cursorrules
+# Test and Debug
+/test/
+/tests/
+/debug/
+*.test.js
+*.spec.js
+debug.log
 
-/doc
-
-electron/dist/
+# Misc
+.DS_Store
+desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+.Spotlight-V100
+.Trashes
+._*
+.fseventsd

@@ -89,9 +89,7 @@ export interface PostAccount {
 
 export interface Post {
   title: string
-  desc: string
-  thumb: string
   content: string
-  markdown: string
-  accounts: PostAccount[]
+  path?: string
+  lastModified?: number
 }

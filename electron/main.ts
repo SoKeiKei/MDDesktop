@@ -1,23 +1,52 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron'
-import * as fs from 'node:fs/promises'
-import * as path from 'node:path'
+import { join } from 'path'
+import { promises as fs } from 'fs'
+
+interface FileInfo {
+  path: string
+  name: string
+  isDirectory: boolean
+  lastModified: number
+}
 
 let mainWindow: BrowserWindow | null = null
+
+async function waitForViteServer(url: string, maxAttempts = 10): Promise<void> {
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      const response = await fetch(url)
+      if (response.ok) return
+    } catch {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+  }
+  throw new Error('Vite server not ready')
+}
 
 async function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1920,
     height: 1080,
+    autoHideMenuBar: true,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: true,  // 确保这个是 true
-      preload: path.join(__dirname, 'preload.cjs')  // preload.cjs 会和 main.cjs 在同一目录
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: join(__dirname, 'preload.cjs'),
+      webSecurity: false
     }
   })
 
   if (process.env.NODE_ENV === 'development') {
-    await mainWindow.loadURL('http://localhost:5173')
-    mainWindow.webContents.openDevTools()
+    const devServerUrl = 'http://localhost:5173'
+    try {
+      // 等待 Vite 开发服务器准备就绪
+      await waitForViteServer(devServerUrl)
+      await mainWindow.loadURL(devServerUrl)
+      mainWindow.webContents.openDevTools()
+    } catch (error) {
+      console.error('Failed to connect to dev server:', error)
+      app.quit()
+    }
   } else {
     await mainWindow.loadFile('dist/index.html')
   }
@@ -29,8 +58,13 @@ async function createWindow() {
 }
 
 // 等待应用准备就绪后再设置 IPC 处理器
-app.whenReady().then(() => {
-  createWindow()
+app.whenReady().then(async () => {
+  try {
+    await createWindow()
+  } catch (error) {
+    console.error('Failed to create window:', error)
+    app.quit()
+  }
 
   // 设置 IPC 处理器
   ipcMain.handle('showOpenDialog', async (event, options) => {
@@ -48,21 +82,24 @@ app.whenReady().then(() => {
     }
   })
 
-  ipcMain.handle('readDirectory', async (event, dirPath) => {
+  ipcMain.handle('readDirectory', async (_, path: string) => {
     try {
-      const files = await fs.readdir(dirPath)
-      const fileInfos = await Promise.all(
-        files.map(async (name) => {
-          const filePath = path.join(dirPath, name)
-          const stats = await fs.stat(filePath)
-          return {
-            path: filePath,
-            name,
-            lastModified: stats.mtimeMs
-          }
+      const files = await fs.readdir(path, { withFileTypes: true })
+      const results = []
+      
+      for (const file of files) {
+        const filePath = join(path, file.name)
+        const stats = await fs.stat(filePath)
+        
+        results.push({
+          path: filePath,
+          name: file.name,
+          isDirectory: file.isDirectory(),
+          lastModified: stats.mtimeMs
         })
-      )
-      return fileInfos
+      }
+      
+      return results
     } catch (error) {
       console.error('Failed to read directory:', error)
       throw error

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Post, PostAccount } from '@/types'
+import type { Post, PostAccount } from '@/types/post'
 import { useStore } from '@/stores'
 import { Check, Info } from 'lucide-vue-next'
 import { CheckboxIndicator, CheckboxRoot, Primitive } from 'radix-vue'
@@ -13,15 +13,19 @@ const allAccounts = ref<PostAccount[]>([])
 const postTaskDialogVisible = ref(false)
 
 const form = ref<Post>({
-  title: ``,
-  desc: ``,
-  thumb: ``,
-  content: ``,
-  markdown: ``,
-  accounts: [] as PostAccount[],
+  title: '',
+  content: '',
+  path: undefined,
+  lastModified: undefined,
+  markdown: '',
+  thumb: '',
+  desc: '',
+  accounts: []
 })
 
-const allowPost = computed(() => extensionInstalled.value && form.value.accounts.some(a => a.checked))
+const allowPost = computed(() => 
+  extensionInstalled.value && form.value.accounts?.some(a => a.checked)
+)
 
 async function prePost() {
   if (extensionInstalled.value && allAccounts.value.length === 0) {
@@ -29,24 +33,24 @@ async function prePost() {
   }
 
   let auto: Post = {
-    thumb: ``,
-    title: ``,
-    desc: ``,
-    content: ``,
-    markdown: ``,
+    thumb: '',
+    title: '',
+    desc: '',
+    content: '',
+    markdown: '',
     accounts: [],
   }
   const accounts = allAccounts.value.filter(a => ![`weixin`, `ipfs`].includes(a.type))
   try {
     auto = {
-      thumb: document.querySelector<HTMLImageElement>(`#output img`)?.src ?? ``,
+      thumb: document.querySelector<HTMLImageElement>(`#output img`)?.src ?? '',
       title: [1, 2, 3, 4, 5, 6]
         .map(h => document.querySelector(`#output h${h}`)!)
         .filter(h => h)[0]
-        .textContent ?? ``,
-      desc: document.querySelector(`#output p`)!.textContent ?? ``,
+        .textContent ?? '',
+      desc: document.querySelector(`#output p`)!.textContent ?? '',
       content: output.value,
-      markdown: editor.value?.getValue() ?? ``,
+      markdown: editor.value?.getValue() ?? '',
       accounts,
     }
   }
@@ -77,7 +81,7 @@ async function getAccounts(): Promise<void> {
 }
 
 function post() {
-  form.value.accounts = form.value.accounts.filter(a => a.checked)
+  form.value.accounts = (form.value.accounts || []).filter((a: PostAccount) => a.checked)
   postTaskDialogVisible.value = true
   dialogVisible.value = false
 }
@@ -184,14 +188,15 @@ onBeforeMount(() => {
                   <Check v-if="account.checked" class="h-4 w-4" />
                 </CheckboxIndicator>
               </CheckboxRoot>
-              <span class="flex items-center gap-2 text-sm">
+              <div class="mb-2 flex items-center gap-2">
                 <img
+                  v-if="account.icon"
                   :src="account.icon"
+                  class="object-cover h-5 w-5"
                   alt=""
-                  class="inline-block h-[20px] w-[20px]"
                 >
-                {{ account.title }} - {{ account.displayName ?? account.home }}
-              </span>
+                <span>{{ account.title || account.displayName }} - {{ account.displayName || account.home || '' }}</span>
+              </div>
             </label>
           </div>
         </div>
