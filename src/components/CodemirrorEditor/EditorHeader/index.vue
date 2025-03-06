@@ -7,8 +7,25 @@ import {
   shiftSign,
 } from '@/config'
 import { useStore } from '@/stores'
+import { useDisplayStore } from '@/stores'
 import { addPrefix, processClipboardContent } from '@/utils'
-import { ChevronDownIcon, Moon, PanelLeftClose, PanelLeftOpen, Settings, Sun, Info } from 'lucide-vue-next'
+import { 
+  Moon, 
+  PanelLeftClose, 
+  PanelLeftOpen, 
+  Settings, 
+  Sun,
+  Bold,
+  Italic,
+  Strikethrough,
+  Link,
+  Code,
+  FileSpreadsheet,
+  FileText,
+  Timer,
+  ImagePlus,
+  Table
+} from 'lucide-vue-next'
 import AboutDialog from './AboutDialog.vue'
 
 const emit = defineEmits([`addFormat`, `formatContent`, `startCopy`, `endCopy`])
@@ -47,8 +64,10 @@ const formatItems = [
 ] as const
 
 const store = useStore()
+const displayStore = useDisplayStore()
 
 const { isDark, isCiteStatus, isCountStatus, output, primaryColor, isOpenPostSlider } = storeToRefs(store)
+const { toggleShowUploadImgDialog, toggleShowInsertFormDialog } = displayStore
 
 const { toggleDark, editorRefresh, citeStatusChanged, countStatusChanged } = store
 
@@ -109,100 +128,229 @@ function copy() {
 </script>
 
 <template>
-  <header class="header-container h-15 flex items-center justify-between px-5 dark:bg-[#191c20]">
-    <div class="space-x-2 flex">
-      <Menubar class="menubar">
-        <FileDropdown />
+  <header class="header-container h-15 flex flex-col">
+    <!-- 原有的菜单栏 -->
+    <div class="flex items-center justify-between px-5 py-2">
+      <div class="space-x-2 flex">
+        <Menubar class="menubar">
+          <FileDropdown />
+          <StyleDropdown />
+          <HelpDropdown />
+        </Menubar>
 
-        <MenubarMenu>
-          <MenubarTrigger> 格式 </MenubarTrigger>
-          <MenubarContent class="w-60" align="start">
-            <MenubarCheckboxItem
-              v-for="{ label, kbd, emitArgs } in formatItems" :key="label"
-              @click="emitArgs[0] === 'addFormat' ? $emit(emitArgs[0], emitArgs[1]) : $emit(emitArgs[0])"
-            >
-              {{ label }}
-              <MenubarShortcut>
-                <kbd v-for="item in kbd" :key="item" class="mx-1 bg-gray-2 dark:bg-stone-9">
-                  {{ item }}
-                </kbd>
-              </MenubarShortcut>
-            </MenubarCheckboxItem>
-            <MenubarSeparator />
-            <MenubarCheckboxItem :checked="isCiteStatus" @click="citeStatusChanged()">
-              微信外链转底部引用
-            </MenubarCheckboxItem>
-            <MenubarSeparator />
-            <MenubarCheckboxItem
-              :checked="isCountStatus"
-              @click="countStatusChanged()"
-            >
-              统计字数和阅读时间
-            </MenubarCheckboxItem>
-          </MenubarContent>
-        </MenubarMenu>
-        <EditDropdown />
-        <StyleDropdown />
-        <HelpDropdown />
-      </Menubar>
-    </div>
+        <div class="flex items-center space-x-1">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" @click="emit('addFormat', `${ctrlKey}-B`)">
+                  <Bold class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>加粗 ({{ ctrlSign }}+B)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
-    <div class="space-x-2 flex">
-      <TooltipProvider :delay-duration="200">
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="outline" @click="isOpenPostSlider = !isOpenPostSlider">
-              <PanelLeftOpen v-show="!isOpenPostSlider" class="size-4" />
-              <PanelLeftClose v-show="isOpenPostSlider" class="size-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="left">
-            {{ isOpenPostSlider ? "关闭" : "内容管理" }}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" @click="emit('addFormat', `${ctrlKey}-I`)">
+                  <Italic class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>斜体 ({{ ctrlSign }}+I)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
-      <Button variant="outline" @click="toggleDark()">
-        <Moon v-show="isDark" class="size-4" />
-        <Sun v-show="!isDark" class="size-4" />
-      </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" @click="emit('addFormat', `${ctrlKey}-D`)">
+                  <Strikethrough class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>删除线 ({{ ctrlSign }}+D)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
-      <div class="bg-background space-x-1 text-background-foreground mx-2 flex items-center border rounded-md">
-        <Button variant="ghost" class="shadow-none" @click="copy">
-          复制
-        </Button>
-        <Separator orientation="vertical" class="h-5" />
-        <DropdownMenu v-model="copyMode">
-          <DropdownMenuTrigger as-child>
-            <Button variant="ghost" class="px-2 shadow-none">
-              <ChevronDownIcon class="text-secondary-foreground h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            :align-offset="-5"
-            class="w-[200px]"
-          >
-            <DropdownMenuRadioGroup v-model="copyMode">
-              <DropdownMenuRadioItem value="txt">
-                公众号格式
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="html">
-                HTML 格式
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" @click="emit('addFormat', `${ctrlKey}-K`)">
+                  <Link class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>超链接 ({{ ctrlSign }}+K)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" @click="emit('addFormat', `${ctrlKey}-E`)">
+                  <Code class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>行内代码 ({{ ctrlSign }}+E)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <Separator orientation="vertical" class="h-4" />
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" @click="toggleShowUploadImgDialog">
+                  <ImagePlus class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>上传图片</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" @click="toggleShowInsertFormDialog">
+                  <Table class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>插入表格</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <Separator orientation="vertical" class="h-4" />
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" @click="emit('formatContent')">
+                  <FileSpreadsheet class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>格式化 ({{ altSign }}+{{ shiftSign }}+F)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  @click="store.citeStatusChanged()"
+                >
+                  <FileText 
+                    class="h-4 w-4 transition-colors" 
+                    :class="store.isCiteStatus ? 'text-primary' : 'text-muted-foreground'"
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  微信外链转底部引用
+                  {{ store.isCiteStatus ? ' (已开启)' : '' }}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  @click="store.countStatusChanged()"
+                >
+                  <Timer 
+                    class="h-4 w-4 transition-colors" 
+                    :class="store.isCountStatus ? 'text-primary' : 'text-muted-foreground'"
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  统计字数和阅读时间
+                  {{ store.isCountStatus ? ' (已开启)' : '' }}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
 
-      <PostInfo />
+      <div class="space-x-2 flex">
+        <TooltipProvider :delay-duration="200">
+          <Tooltip>
+            <TooltipTrigger as-child>
+              <Button variant="outline" @click="isOpenPostSlider = !isOpenPostSlider">
+                <PanelLeftOpen v-show="!isOpenPostSlider" class="size-4" />
+                <PanelLeftClose v-show="isOpenPostSlider" class="size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              {{ isOpenPostSlider ? "关闭" : "内容管理" }}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
-      <Button variant="outline" @click="store.isOpenRightSlider = !store.isOpenRightSlider">
-        <Settings class="size-4" />
-      </Button>
+        <Button variant="outline" @click="toggleDark()">
+          <Moon v-show="isDark" class="size-4" />
+          <Sun v-show="!isDark" class="size-4" />
+        </Button>
 
+        <div class="bg-background space-x-1 text-background-foreground mx-2 flex items-center border rounded-md">
+          <Button variant="ghost" class="shadow-none" @click="copy">
+            复制
+          </Button>
+          <Separator orientation="vertical" class="h-5" />
+          <DropdownMenu v-model="copyMode">
+            <DropdownMenuTrigger as-child>
+              <Button variant="ghost" class="px-2 shadow-none">
+                <ChevronDownIcon class="text-secondary-foreground h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              :align-offset="-5"
+              class="w-[200px]"
+            >
+              <DropdownMenuRadioGroup v-model="copyMode">
+                <DropdownMenuRadioItem value="txt">
+                  公众号格式
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="html">
+                  HTML 格式
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-      <Toaster rich-colors position="top-center" />
+        <PostInfo />
+
+        <Button variant="outline" @click="store.isOpenRightSlider = !store.isOpenRightSlider">
+          <Settings class="size-4" />
+        </Button>
+
+        <Toaster rich-colors position="top-center" />
+      </div>
     </div>
 
     <AboutDialog :visible="visible" @close="visible = false" />
