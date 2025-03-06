@@ -25,7 +25,19 @@ import {
   Timer,
   ImagePlus,
   Table,
-  ChevronDown
+  ChevronDown,
+  Heading,
+  List,
+  Quote,
+  FileCode,
+  SeparatorHorizontal,
+  Image,
+  Search,
+  Replace,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
 } from 'lucide-vue-next'
 import AboutDialog from './AboutDialog.vue'
 
@@ -143,12 +155,11 @@ function copy() {
           <StyleDropdown />
           <HelpDropdown />
         </Menubar>
-
-        <div class="flex items-center space-x-1">
+        <div class="flex items-center space-x-0.5">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" @click="emit('addFormat', `${ctrlKey}-B`)">
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', `${ctrlKey}-B`)">
                   <Bold class="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -161,7 +172,7 @@ function copy() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" @click="emit('addFormat', `${ctrlKey}-I`)">
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', `${ctrlKey}-I`)">
                   <Italic class="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -174,7 +185,7 @@ function copy() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" @click="emit('addFormat', `${ctrlKey}-D`)">
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', `${ctrlKey}-D`)">
                   <Strikethrough class="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -184,10 +195,130 @@ function copy() {
             </Tooltip>
           </TooltipProvider>
 
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" class="h-8 w-8">
+                <Heading class="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem @click="emit('addFormat', 'h1')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-bold">H1</span>
+                  <span class="text-muted-foreground text-sm">一级标题 ({{ ctrlSign }}+1)</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="emit('addFormat', 'h2')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-bold">H2</span>
+                  <span class="text-muted-foreground text-sm">二级标题 ({{ ctrlSign }}+2)</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="emit('addFormat', 'h3')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-bold">H3</span>
+                  <span class="text-muted-foreground text-sm">三级标题 ({{ ctrlSign }}+3)</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="emit('addFormat', 'h4')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-bold">H4</span>
+                  <span class="text-muted-foreground text-sm">四级标题</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="emit('addFormat', 'h5')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-bold">H5</span>
+                  <span class="text-muted-foreground text-sm">五级标题</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="emit('addFormat', 'h6')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-bold">H6</span>
+                  <span class="text-muted-foreground text-sm">六级标题</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" class="h-8 w-8">
+                <List class="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent class="min-w-[130px]">
+              <DropdownMenuItem @click="emit('addFormat', 'ul')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-mono">-</span>
+                  <span class="text-muted-foreground text-sm">无序列表 ({{ ctrlSign }}+U)</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="emit('addFormat', 'ol')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-mono">1.</span>
+                  <span class="text-muted-foreground text-sm">有序列表 ({{ ctrlSign }}+O)</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="emit('addFormat', 'task')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-mono">- [ ]</span>
+                  <span class="text-muted-foreground text-sm">任务列表 ({{ ctrlSign }}+T)</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" class="h-8 w-8">
+                <AlignLeft class="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem @click="emit('addFormat', 'align-left')">
+                <div class="flex items-center justify-between w-full">
+                  <div class="flex items-center gap-2">
+                    <AlignLeft class="h-4 w-4" />
+                    <span>左对齐</span>
+                  </div>
+                  <span class="text-muted-foreground text-sm">{{ ctrlSign }}+[</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="emit('addFormat', 'align-center')">
+                <div class="flex items-center justify-between w-full">
+                  <div class="flex items-center gap-2">
+                    <AlignCenter class="h-4 w-4" />
+                    <span>居中对齐</span>
+                  </div>
+                  <span class="text-muted-foreground text-sm">{{ ctrlSign }}+M</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="emit('addFormat', 'align-right')">
+                <div class="flex items-center justify-between w-full">
+                  <div class="flex items-center gap-2">
+                    <AlignRight class="h-4 w-4" />
+                    <span>右对齐</span>
+                  </div>
+                  <span class="text-muted-foreground text-sm">{{ ctrlSign }}+]</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="emit('addFormat', 'align-justify')">
+                <div class="flex items-center justify-between w-full">
+                  <div class="flex items-center gap-2">
+                    <AlignJustify class="h-4 w-4" />
+                    <span>两端对齐</span>
+                  </div>
+                  <span class="text-muted-foreground text-sm">{{ ctrlSign }}+J</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" @click="emit('addFormat', `${ctrlKey}-K`)">
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', `${ctrlKey}-K`)">
                   <Link class="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -197,10 +328,25 @@ function copy() {
             </Tooltip>
           </TooltipProvider>
 
+          <Separator orientation="vertical" class="h-4 mx-0.5" />
+
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" @click="emit('addFormat', `${ctrlKey}-E`)">
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', 'quote')">
+                  <Quote class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>引用块 ({{ ctrlSign }}+Q)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', `${ctrlKey}-E`)">
                   <Code class="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -210,12 +356,51 @@ function copy() {
             </Tooltip>
           </TooltipProvider>
 
-          <Separator orientation="vertical" class="h-4" />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', 'codeblock')">
+                  <FileCode class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>代码块 ({{ ctrlSign }}+{{ shiftSign }}+K)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" @click="toggleShowUploadImgDialog">
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', 'hr')">
+                  <SeparatorHorizontal class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>分隔线 ({{ ctrlSign }}+{{ shiftSign }}+H)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <Separator orientation="vertical" class="h-4 mx-0.5" />
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', 'image')">
+                  <Image class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>图片链接 ({{ ctrlSign }}+{{ shiftSign }}+I)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="toggleShowUploadImgDialog">
                   <ImagePlus class="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -228,7 +413,7 @@ function copy() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" @click="toggleShowInsertFormDialog">
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="toggleShowInsertFormDialog">
                   <Table class="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -238,12 +423,12 @@ function copy() {
             </Tooltip>
           </TooltipProvider>
 
-          <Separator orientation="vertical" class="h-4" />
+          <Separator orientation="vertical" class="h-4 mx-0.5" />
 
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" @click="emit('formatContent')">
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('formatContent')">
                   <FileSpreadsheet class="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -256,15 +441,9 @@ function copy() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  @click="store.citeStatusChanged()"
-                >
-                  <FileText 
-                    class="h-4 w-4 transition-colors" 
-                    :class="store.isCiteStatus ? 'text-primary' : 'text-muted-foreground'"
-                  />
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="store.citeStatusChanged()">
+                  <FileText class="h-4 w-4 transition-colors"
+                    :class="store.isCiteStatus ? 'text-primary' : 'text-muted-foreground'" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -279,15 +458,9 @@ function copy() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  @click="store.countStatusChanged()"
-                >
-                  <Timer 
-                    class="h-4 w-4 transition-colors" 
-                    :class="store.isCountStatus ? 'text-primary' : 'text-muted-foreground'"
-                  />
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="store.countStatusChanged()">
+                  <Timer class="h-4 w-4 transition-colors"
+                    :class="store.isCountStatus ? 'text-primary' : 'text-muted-foreground'" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -295,6 +468,51 @@ function copy() {
                   统计字数和阅读时间
                   {{ store.isCountStatus ? ' (已开启)' : '' }}
                 </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <Separator orientation="vertical" class="h-4 mx-0.5" />
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', 'search')">
+                  <Search class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div class="space-y-1 text-sm">
+                  <p>查找 ({{ ctrlSign }}+F)</p>
+                  <p class="text-muted-foreground">
+                    {{ ctrlSign }}+G: 查找下一个<br>
+                    {{ shiftSign }}+{{ ctrlSign }}+G: 查找上一个<br>
+                    {{ ctrlSign }}+H: 打开替换<br>
+                    ESC: 关闭搜索
+                  </p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('addFormat', 'replace')">
+                  <Replace class="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div class="space-y-1 text-sm">
+                  <p>查找并替换 ({{ ctrlSign }}+H)</p>
+                  <p class="text-muted-foreground">
+                    1. 输入要查找的文本<br>
+                    2. 输入要替换的文本<br>
+                    Enter: 替换并查找下一个<br>
+                    {{ shiftSign }}+Enter: 全部替换<br>
+                    ESC: 关闭替换
+                  </p>
+                </div>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -332,11 +550,7 @@ function copy() {
                 <ChevronDown class="text-secondary-foreground h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              :align-offset="-5"
-              class="w-[200px]"
-            >
+            <DropdownMenuContent align="end" :align-offset="-5" class="w-[200px]">
               <DropdownMenuRadioGroup v-model="copyMode">
                 <DropdownMenuRadioItem value="txt">
                   公众号格式

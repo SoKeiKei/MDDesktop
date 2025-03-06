@@ -191,7 +191,15 @@ export const useStore = defineStore(`store`, () => {
 
     const { markdownContent, readingTime: readingTimeResult } = renderer.parseFrontMatterAndContent(editor.value!.getValue())
     readingTime.value = readingTimeResult
+    
     let outputTemp = marked.parse(markdownContent) as string
+    
+    // 转换简易对齐标签为完整样式
+    outputTemp = outputTemp.replace(
+      /<(left|center|right|justify)>(.*?)<\/\1>/g,
+      (_, type, text) => `<div style="text-align: ${type}">${text}</div>`
+    )
+    
     outputTemp = DOMPurify.sanitize(outputTemp)
 
     // 阅读时间及字数统计

@@ -218,13 +218,15 @@ function initEditor() {
     editorDom.value = store.posts[store.currentPostIndex].content
   }
   editor.value = CodeMirror.fromTextArea(editorDom, {
-    mode: `text/x-markdown`,
+    mode: 'gfm',  // 使用 GitHub Flavored Markdown 模式
     theme: isDark.value ? `darcula` : `xq-light`,
     lineNumbers: false,
     lineWrapping: true,
     styleActiveLine: true,
     autoCloseBrackets: true,
+    // 启用代码提示
     extraKeys: {
+      'Ctrl-Space': 'autocomplete',  // 触发代码提示的快捷键
       [`${shiftKey}-${altKey}-F`]: function autoFormat(editor) {
         formatDoc(editor.getValue()).then((doc) => {
           editor.setValue(doc)
@@ -255,6 +257,194 @@ function initEditor() {
         const selected = editor.getSelection()
         editor.replaceSelection(`\`${selected}\``)
       },
+      // 标题快捷键
+      [`${ctrlKey}-1`]: function h1(editor) {
+        addFormat('h1')
+      },
+      [`${ctrlKey}-2`]: function h2(editor) {
+        addFormat('h2')
+      },
+      [`${ctrlKey}-3`]: function h3(editor) {
+        addFormat('h3')
+      },
+      // 列表快捷键
+      [`${ctrlKey}-U`]: function ul(editor) {
+        addFormat('ul')
+      },
+      [`${ctrlKey}-O`]: function ol(editor) {
+        addFormat('ol')
+      },
+      [`${ctrlKey}-T`]: function task(editor) {
+        addFormat('task')
+      },
+      // 其他快捷键
+      [`${ctrlKey}-Q`]: function quote(editor) {
+        addFormat('quote')
+      },
+      [`${ctrlKey}-${shiftKey}-K`]: function codeblock(editor) {
+        addFormat('codeblock')
+      },
+      [`${ctrlKey}-${shiftKey}-H`]: function hr(editor) {
+        addFormat('hr')
+      },
+      [`${ctrlKey}-${shiftKey}-I`]: function image(editor) {
+        addFormat('image')
+      },
+      // 使用 CodeMirror 原生搜索功能
+      [`${ctrlKey}-F`]: 'findPersistent',  // 搜索
+      [`${ctrlKey}-G`]: 'findNext',        // 查找下一个
+      [`${shiftKey}-${ctrlKey}-G`]: 'findPrev', // 查找上一个
+      [`${ctrlKey}-H`]: 'replace',         // 替换
+      // 对齐快捷键
+      [`${ctrlKey}-[`]: () => addFormat('align-left'),
+      [`${ctrlKey}-M`]: () => addFormat('align-center'),
+      [`${ctrlKey}-]`]: () => addFormat('align-right'),
+      [`${ctrlKey}-J`]: () => addFormat('align-justify'),
+    },
+    // 配置提示选项
+    hintOptions: {
+      completeSingle: false,         // 当只有一个选项时不自动补全
+      closeOnUnfocus: true,         // 失去焦点时关闭提示
+      alignWithWord: true,          // 提示框对齐当前单词
+      hint: function(cm, options) {
+        const cursor = cm.getCursor()
+        const line = cm.getLine(cursor.line)
+        const token = cm.getTokenAt(cursor)
+        const currentWord = token.string.toLowerCase()
+        
+        // 根据当前行开头判断上下文
+        const lineStart = line.slice(0, cursor.ch)
+        
+        // 对齐方式提示
+        if (currentWord.startsWith('<')) {
+          return {
+            list: [
+              { 
+                text: '<left></left>', 
+                displayText: '<left> 左对齐', 
+                shortcut: 'Ctrl+[',
+                cursorOffset: 6  // 光标位置偏移，放在开始标签后
+              },
+              { 
+                text: '<center></center>', 
+                displayText: '<center> 居中对齐', 
+                shortcut: 'Ctrl+M',
+                cursorOffset: 8
+              },
+              { 
+                text: '<right></right>', 
+                displayText: '<right> 右对齐', 
+                shortcut: 'Ctrl+]',
+                cursorOffset: 7
+              },
+              { 
+                text: '<justify></justify>', 
+                displayText: '<justify> 两端对齐', 
+                shortcut: 'Ctrl+J',
+                cursorOffset: 9
+              }
+            ],
+            from: CodeMirror.Pos(cursor.line, token.start),
+            to: CodeMirror.Pos(cursor.line, token.end),
+            hint: (cm: any, data: any, item: any) => {
+              cm.replaceRange(item.text, data.from, data.to)
+              // 将光标移动到标签内部
+              if (item.cursorOffset) {
+                const cursor = cm.getCursor()
+                cm.setCursor({
+                  line: cursor.line,
+                  ch: data.from.ch + item.cursorOffset
+                })
+              }
+            }
+          }
+        }
+        
+        // 代码块语言提示
+        if (lineStart.match(/^```\s*$/)) {
+          return {
+            list: ['javascript', 'typescript', 'html', 'css', 'python', 'java', 'c', 'cpp', 'go', 'rust', 'php', 'sql']
+              .filter(lang => lang.startsWith(currentWord))
+              .map(lang => ({ text: lang, displayText: `${lang} 代码块` })),
+            from: cursor,
+            to: cursor
+          }
+        }
+        
+        // 表格语法提示
+        if (lineStart.match(/^\|.*\|?\s*$/)) {
+          return {
+            list: ['---|', ':---|', ':---:|', '---:|'].map(text => ({
+              text,
+              displayText: '表格对齐'
+            })),
+            from: CodeMirror.Pos(cursor.line, cursor.ch),
+            to: CodeMirror.Pos(cursor.line, cursor.ch)
+          }
+        }
+
+        // Markdown 语法提示
+        const markdownHints = [
+          { text: '# ', displayText: '# 一级标题', shortcut: 'Ctrl+1' },
+          { text: '## ', displayText: '## 二级标题', shortcut: 'Ctrl+2' },
+          { text: '### ', displayText: '### 三级标题', shortcut: 'Ctrl+3' },
+          { text: '- ', displayText: '- 无序列表项', shortcut: 'Ctrl+U' },
+          { text: '1. ', displayText: '1. 有序列表项', shortcut: 'Ctrl+O' },
+          { text: '- [ ] ', displayText: '- [ ] 待办事项', shortcut: 'Ctrl+T' },
+          { text: '> ', displayText: '> 引用内容', shortcut: 'Ctrl+Q' },
+          { text: '```', displayText: '``` 代码块 ```', shortcut: 'Ctrl+K' },
+          { text: '**', displayText: '**粗体文本**', shortcut: 'Ctrl+B' },
+          { text: '*', displayText: '*斜体文本*', shortcut: 'Ctrl+I' },
+          { text: '[链接](url)', displayText: '[链接文本](链接地址)', shortcut: 'Ctrl+K' },
+          { text: '![图片](url)', displayText: '![图片描述](图片地址)', shortcut: 'Ctrl+I' },
+          { text: '---', displayText: '--- 分隔线', shortcut: 'Ctrl+H' },
+          { text: '|列1|列2|', displayText: '|表头1|表头2| 表格', shortcut: 'Ctrl+L' },
+          { text: '`', displayText: '`行内代码`', shortcut: 'Ctrl+E' },
+          { text: '~~', displayText: '~~删除线文本~~', shortcut: 'Ctrl+D' },
+          { text: '> [!NOTE]', displayText: '> [!NOTE] 提示框', shortcut: 'Ctrl+Q' },
+          { text: '> [!WARNING]', displayText: '> [!WARNING] 警告框', shortcut: 'Ctrl+Q' },
+          { text: '> [!TIP]', displayText: '> [!TIP] 技巧框', shortcut: 'Ctrl+Q' },
+          // 表格对齐语法
+          { text: '|:---|', displayText: '|:---| 表格左对齐', shortcut: '' },
+          { text: '|:---:|', displayText: '|:---:| 表格居中对齐', shortcut: '' },
+          { text: '|---:|', displayText: '|---:| 表格右对齐', shortcut: '' },
+        ]
+        
+        // 过滤出匹配当前输入的提示
+        const filteredHints = markdownHints.filter(hint => 
+          hint.text.toLowerCase().startsWith(currentWord) ||
+          hint.displayText.toLowerCase().includes(currentWord)
+        )
+        
+        // 渲染提示项
+        function renderHint(elem: HTMLElement, data: any, cur: any) {
+          const text = cur.displayText || cur.text
+          const shortcut = cur.shortcut || ''
+          
+          // 分离语法和说明
+          const [syntax, description] = text.split(' ')
+          
+          if (shortcut) {
+            elem.innerHTML = `
+              <span class="hint-syntax">${syntax}</span>
+              <span class="hint-description">${description || ''}</span>
+              <span class="hint-shortcut">${shortcut}</span>
+            `
+          } else {
+            elem.innerHTML = `
+              <span class="hint-syntax">${syntax}</span>
+              <span class="hint-description">${description || ''}</span>
+            `
+          }
+        }
+
+        return {
+          list: filteredHints,
+          from: CodeMirror.Pos(cursor.line, token.start),
+          to: CodeMirror.Pos(cursor.line, token.end),
+          renderHint
+        }
+      }
     },
   })
 
@@ -284,13 +474,126 @@ function initEditor() {
       }
     }
   })
+
+  // 输入时自动触发提示
+  editor.value.on('inputRead', (cm, change) => {
+    if (change.origin !== 'setValue') {
+      cm.showHint({ completeSingle: false })
+    }
+  })
 }
 
 const container = ref(null)
 
 // 工具函数，添加格式
-function addFormat(cmd: string | number) {
-  (editor.value as any).options.extraKeys[cmd](editor.value)
+function addFormat(type: string) {
+  const editorInstance = editor.value
+  if (!editorInstance) return
+  
+  // 处理搜索和替换
+  if (type === 'search') {
+    editorInstance.execCommand('findPersistent')
+    return
+  }
+  if (type === 'replace') {
+    editorInstance.execCommand('replace')
+    return
+  }
+  
+  // 处理标题格式
+  if (type.match(/^h[1-6]$/)) {
+    const cursor = editorInstance.getCursor()
+    const line = editorInstance.getLine(cursor.line)
+    const lineStart = { line: cursor.line, ch: 0 }
+    
+    // 移除现有的标题标记
+    const headerMatch = line.match(/^#{1,6}\s/)
+    if (headerMatch) {
+      editorInstance.replaceRange('', lineStart, { line: cursor.line, ch: headerMatch[0].length })
+    }
+    
+    // 如果不是同级标题，添加新的标题标记
+    const headerLevel = parseInt(type.replace('h', ''))
+    if (!headerMatch || headerMatch[0].length !== headerLevel + 1) {
+      const prefix = '#'.repeat(headerLevel) + ' '
+      editorInstance.replaceRange(prefix, lineStart, lineStart)
+    }
+    return
+  }
+  
+  // 处理列表格式
+  if (['ul', 'ol', 'task'].includes(type)) {
+    const cursor = editorInstance.getCursor()
+    const line = editorInstance.getLine(cursor.line)
+    const lineStart = { line: cursor.line, ch: 0 }
+    
+    // 移除现有的列表标记
+    const listMatch = line.match(/^(\d+\.|[-\*]|\[[ x]\])\s/)
+    if (listMatch) {
+      editorInstance.replaceRange('', lineStart, { line: cursor.line, ch: listMatch[0].length })
+    }
+    
+    // 添加新的列表标记
+    const prefix = {
+      ul: '- ',
+      ol: '1. ',
+      task: '- [ ] '
+    }[type]
+    
+    editorInstance.replaceRange(prefix, lineStart, lineStart)
+    return
+  }
+  
+  // 处理其他格式
+  if (['quote', 'codeblock', 'hr', 'image'].includes(type)) {
+    const cursor = editorInstance.getCursor()
+    const selection = editorInstance.getSelection()
+    
+    const formats = {
+      quote: `> ${selection || '引用内容'}\n`,
+      codeblock: `\`\`\`\n${selection || '代码'}\n\`\`\`\n`,
+      hr: `\n---\n`,
+      image: `![${selection || '图片描述'}](图片链接)\n`
+    }
+    
+    editorInstance.replaceSelection(formats[type])
+    return
+  }
+  
+  // 处理对齐方式
+  if (type.startsWith('align-')) {
+    const cursor = editorInstance.getCursor()
+    const line = editorInstance.getLine(cursor.line)
+    const lineStart = { line: cursor.line, ch: 0 }
+    
+    // 移除现有的对齐样式
+    const alignMatch = line.match(/^<(left|center|right|justify)>(.*?)<\/\1>$/)
+    if (alignMatch) {
+      // 提取原文本内容
+      const content = alignMatch[2]
+      editorInstance.replaceRange(
+        content,
+        lineStart,
+        { line: cursor.line, ch: line.length }
+      )
+    }
+    
+    // 添加新的对齐样式
+    const alignType = type.replace('align-', '')
+    if (!alignMatch || alignMatch[1] !== alignType) {
+      const selection = editorInstance.getSelection() || line
+      const alignedText = `<${alignType}>${selection}</${alignType}>`
+      editorInstance.replaceRange(
+        alignedText,
+        lineStart,
+        { line: cursor.line, ch: line.length }
+      )
+    }
+    return
+  }
+  
+  // 处理其他格式化命令
+  (editorInstance as any).options.extraKeys[type](editorInstance)
 }
 
 const codeMirrorWrapper = ref<ComponentPublicInstance<HTMLDivElement> | null>(null)

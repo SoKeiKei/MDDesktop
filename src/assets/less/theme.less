@@ -66,3 +66,300 @@
 .cm-comment {
   font-style: normal !important;
 }
+
+/* CodeMirror 提示框样式 */
+.CodeMirror-hints {
+  position: absolute;
+  z-index: 1100;
+  overflow: hidden;
+  list-style: none;
+  margin: 0;
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-height: 20em;
+  min-width: 180px;
+  overflow-y: auto;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.CodeMirror-hint {
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: 4px;
+  white-space: pre;
+  cursor: pointer;
+  font-size: 13px;
+  color: hsl(var(--foreground));
+  transition: all 0.1s ease;
+  
+  /* 显示快捷键的样式 */
+  .hint-shortcut {
+    float: right;
+    margin-left: 16px;
+    color: hsl(var(--muted-foreground));
+    font-size: 12px;
+    opacity: 0.7;
+  }
+
+  /* 语法示例样式 */
+  .hint-syntax {
+    color: hsl(var(--primary));
+    margin-right: 8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+  
+  /* 语法说明样式 */
+  .hint-description {
+    color: hsl(var(--foreground));
+  }
+}
+
+/* 暗色模式适配 */
+.dark .CodeMirror-hints {
+  border-color: hsla(var(--border), 0.5);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  background: hsl(var(--background));
+  
+  .CodeMirror-hint {
+    .hint-syntax {
+      color: hsl(var(--primary));
+    }
+    
+    .hint-description {
+      color: hsl(var(--foreground));
+    }
+    
+    .hint-shortcut {
+      color: hsl(var(--muted-foreground));
+    }
+  }
+}
+
+/* 选中状态 */
+li.CodeMirror-hint-active {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+  
+  .hint-shortcut {
+    color: hsla(var(--accent-foreground), 0.8);
+  }
+  
+  /* 选中状态下的语法和说明 */
+  .hint-syntax,
+  .hint-description {
+    color: hsl(var(--accent-foreground));
+  }
+}
+
+/* 滚动条样式 */
+.CodeMirror-hints::-webkit-scrollbar {
+  width: 6px;
+}
+
+.CodeMirror-hints::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.CodeMirror-hints::-webkit-scrollbar-thumb {
+  background-color: hsla(var(--muted-foreground), 0.2);
+  border-radius: 3px;
+}
+
+.dark .CodeMirror-hints::-webkit-scrollbar-thumb {
+  background-color: hsla(var(--muted-foreground), 0.3);
+}
+
+/* Markdown 语法高亮自定义样式 */
+.CodeMirror.CodeMirror {  // 提高选择器优先级
+  // 当前激活行的样式
+  .CodeMirror-activeline-background {
+    background: rgba(147, 197, 253, 0.2);  // 浅蓝色背景
+    border-radius: 6px;
+    margin: -1px -3px;
+  }
+
+  // 暗色模式下的激活行样式
+  &.cm-s-darcula .CodeMirror-activeline-background {
+    background: rgba(147, 197, 253, 0.1);  // 更暗的背景色
+  }
+
+  // 标题 - 使用不同颜色区分级别
+  .cm-header-1 {
+    color: #e11d48;  // 深红色
+    font-weight: 700;
+    font-size: 1.4em;
+  }
+  
+  .cm-header-2 {
+    color: #f59e0b;  // 橙色
+    font-weight: 600;
+    font-size: 1.3em;
+  }
+  
+  .cm-header-3 {
+    color: #3b82f6;  // 蓝色
+    font-weight: 600;
+    font-size: 1.2em;
+  }
+  
+  .cm-header-4, .cm-header-5, .cm-header-6 {
+    color: #8b5cf6;  // 紫色
+    font-weight: 600;
+    font-size: 1em;
+  }
+
+  // 粗体
+  .cm-formatting-strong,
+  .cm-strong,
+  .formatting-strong {
+    color: #f97316;  // 橙色
+    font-weight: 600;
+  }
+
+  // 斜体
+  .cm-formatting-em,
+  .cm-em,
+  .formatting-em {
+    color: #22c55e;  // 绿色
+    font-style: italic;
+  }
+
+  // 删除线
+  .cm-formatting-strikethrough,
+  .cm-strikethrough {
+    color: #dc2626;  // 红色
+    text-decoration: line-through;
+  }
+
+  // 链接
+  .cm-link {
+    color: #0ea5e9;  // 蓝色
+    text-decoration: none;
+  }
+
+  // 图片
+  .cm-image-marker {
+    color: #8b5cf6;  // 紫色
+  }
+
+  .cm-image-alt {
+    color: #64748b;  // 灰色
+    font-style: italic;
+  }
+
+  // 代码
+  .cm-comment {
+    color: #ef4444;  // 红色
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    padding: 0 4px;
+    border-radius: 3px;
+  }
+
+  // 列表
+  .cm-formatting-list,
+  .cm-formatting-list-ul {
+    color: #3b82f6;  // 蓝色
+    font-weight: 500;
+  }
+
+  .cm-formatting-list-ol {
+    color: #8b5cf6;  // 紫色
+    font-weight: 500;
+  }
+
+  // 任务列表
+  .cm-formatting-task {
+    color: #22c55e;  // 绿色
+    font-weight: 500;
+  }
+
+  // 列表内容
+  .cm-list1,
+  .cm-list2,
+  .cm-list3 {
+    color: inherit;  // 使用默认文本颜色
+  }
+
+  // 引用
+  .cm-quote {
+    color: #64748b;  // 灰色
+    font-style: italic;
+    padding-left: 8px;
+    margin-left: 4px;
+  }
+
+  // 分隔线
+  .cm-hr {
+    color: #94a3b8;  // 灰色
+    font-weight: bold;
+  }
+
+  // 适配暗色模式
+  .dark & {
+    .cm-header-1 {
+      color: #f87171;  // 亮红色
+    }
+    
+    .cm-header-2 {
+      color: #fbbf24;  // 亮橙色
+    }
+    
+    .cm-header-3 {
+      color: #60a5fa;  // 亮蓝色
+    }
+    
+    .cm-header-4, .cm-header-5, .cm-header-6 {
+      color: #a78bfa;  // 亮紫色
+    }
+    
+    .cm-formatting-strong,
+    .cm-strong,
+    .formatting-strong {
+      color: #fb923c;  // 亮橙色
+    }
+
+    .cm-formatting-em,
+    .cm-em,
+    .formatting-em {
+      color: #4ade80;  // 亮绿色
+    }
+
+    .cm-formatting-strikethrough,
+    .cm-strikethrough {
+      color: #f87171;  // 亮红色
+    }
+
+    .cm-link {
+      color: #38bdf8;  // 亮蓝色
+    }
+
+    .cm-comment {
+      color: #f87171;  // 亮红色
+    }
+    
+    .cm-quote {
+      color: #94a3b8;  // 更亮的灰色
+      border-left-color: currentColor;
+    }
+
+    .cm-formatting-list,
+    .cm-formatting-list-ul {
+      color: #60a5fa;  // 亮蓝色
+    }
+
+    .cm-formatting-list-ol {
+      color: #a78bfa;  // 亮紫色
+    }
+
+    .cm-formatting-task {
+      color: #4ade80;  // 亮绿色
+    }
+
+    .cm-hr {
+      color: #cbd5e1;  // 更亮的灰色
+    }
+  }
+}
