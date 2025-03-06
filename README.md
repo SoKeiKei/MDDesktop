@@ -2,7 +2,8 @@
 
 基于 [doocs/md](https://github.com/doocs/md) 二次开发的桌面版微信 Markdown 编辑器。
 
-![v1.1.2 windows版](https://fastly.jsdelivr.net/gh/bucketio/img8@main/2025/03/07/1741282916081-dd8295eb-538e-4bae-b4b9-359280dd71c9.png)
+![v1.1.2 windows版](https://fastly.jsdelivr.net/gh/bucketio/img13@main/2025/03/07/1741285500979-c54dea05-7e3f-4937-8955-d1647597951c.png)
+
 
 ## 重要说明
 
@@ -88,9 +89,9 @@ npm run electron:build:linux
 ```
 
 构建产物将输出到 `release` 目录：
-- Windows: `MD Desktop-1.1.1-win-x64.exe`
-- macOS: `MD.Desktop-1.1.1.dmg`
-- Linux: `MD Desktop-1.1.1-linux-x64.AppImage`
+- Windows: `MD Desktop-1.1.2-win-x64.exe`
+- macOS: `MD.Desktop-1.1.2.dmg`
+- Linux: `MD Desktop-1.1.2-linux-x64.AppImage`
 
 > 注意：跨平台构建可能会遇到一些限制，建议在目标平台上进行构建。
 
@@ -112,7 +113,7 @@ npm run electron:build:linux
 
 ## 使用说明
 
-1. [下载对应平台的安装包](https://github.com/SoKeiKei/MDDesktop/releases/tag/v1.1.1) 
+1. [下载对应平台的安装包](https://github.com/SoKeiKei/MDDesktop/releases/tag/v1.1.2) 
 2. 安装并运行应用
 3. 开始使用 Markdown 编辑器
 

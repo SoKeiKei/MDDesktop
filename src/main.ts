@@ -2,12 +2,13 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
 
+// 基础样式
 import 'virtual:uno.css'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/xq-light.css'
 import 'codemirror/theme/darcula.css'
 
-/* 每个页面公共css */
+// 每个页面公共css
 import '@/assets/index.css'
 import '@/assets/less/theme.less'
 

@@ -11,6 +11,7 @@ import * as Minio from 'minio'
 import * as qiniu from 'qiniu-js'
 import OSS from 'tiny-oss'
 import { v4 as uuidv4 } from 'uuid'
+import { ipcRenderer } from 'electron'
 
 function getConfig(useDefault: boolean, platform: string) {
   if (useDefault) {

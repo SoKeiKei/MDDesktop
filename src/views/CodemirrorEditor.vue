@@ -306,7 +306,7 @@ function initEditor() {
       completeSingle: false,         // 当只有一个选项时不自动补全
       closeOnUnfocus: true,         // 失去焦点时关闭提示
       alignWithWord: true,          // 提示框对齐当前单词
-      hint: function(cm, options) {
+      hint: function(cm: CodeMirror.Editor, options: any) {
         const cursor = cm.getCursor()
         const line = cm.getLine(cursor.line)
         const token = cm.getTokenAt(cursor)
@@ -534,13 +534,17 @@ function addFormat(type: string) {
     }
     
     // 添加新的列表标记
-    const prefix = {
+    const prefixMap = {
       ul: '- ',
       ol: '1. ',
       task: '- [ ] '
-    }[type]
+    } as const
     
-    editorInstance.replaceRange(prefix, lineStart, lineStart)
+    const prefix = prefixMap[type as keyof typeof prefixMap]
+    
+    if (prefix) {  // 添加类型检查
+      editorInstance.replaceRange(prefix, lineStart, lineStart)
+    }
     return
   }
   
@@ -549,7 +553,7 @@ function addFormat(type: string) {
     const cursor = editorInstance.getCursor()
     const selection = editorInstance.getSelection()
     
-    const formats = {
+    const formats: Record<string, string> = {
       quote: `> ${selection || '引用内容'}\n`,
       codeblock: `\`\`\`\n${selection || '代码'}\n\`\`\`\n`,
       hr: `\n---\n`,

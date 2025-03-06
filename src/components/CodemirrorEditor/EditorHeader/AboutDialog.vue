@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import pkg from '../../../../package.json'
 
 const props = defineProps({
   visible: {
@@ -11,7 +12,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
-const version = '1.1.1'
+const version = pkg.version
 
 function onUpdate(val: boolean) {
   if (!val) {
