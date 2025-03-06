@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Toaster } from '@/components/ui/sonner'
+import { toast } from 'vue-sonner'
 import {
   altSign,
   ctrlKey,
@@ -24,7 +24,8 @@ import {
   FileText,
   Timer,
   ImagePlus,
-  Table
+  Table,
+  ChevronDown
 } from 'lucide-vue-next'
 import AboutDialog from './AboutDialog.vue'
 
@@ -105,7 +106,6 @@ function copy() {
         document.execCommand(`copy`)
         window.getSelection()!.removeAllRanges()
       }
-      clipboardDiv.innerHTML = output.value
       if (isBeforeDark) {
         nextTick(() => toggleDark())
       }
@@ -113,15 +113,21 @@ function copy() {
         await copyContent(temp)
       }
 
-      // 输出提示
-      toast.success(
-        copyMode.value === `html`
-          ? `已复制 HTML 源码，请进行下一步操作。`
-          : `已复制渲染后的内容到剪贴板，可直接到公众号后台粘贴。`,
-      )
-
-      editorRefresh()
-      emit(`endCopy`)
+      // 延迟恢复内容和显示提示
+      setTimeout(() => {
+        clipboardDiv.innerHTML = output.value
+        // 输出提示
+        toast.success(
+          copyMode.value === `html`
+            ? `已复制 HTML 源码，请进行下一步操作。`
+            : `已复制渲染后的内容到剪贴板，可直接到公众号后台粘贴。`,
+          {
+            duration: 3000
+          }
+        )
+        editorRefresh()
+        emit(`endCopy`)
+      }, 800)
     })
   }, 350)
 }
@@ -323,7 +329,7 @@ function copy() {
           <DropdownMenu v-model="copyMode">
             <DropdownMenuTrigger as-child>
               <Button variant="ghost" class="px-2 shadow-none">
-                <ChevronDownIcon class="text-secondary-foreground h-4 w-4" />
+                <ChevronDown class="text-secondary-foreground h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -348,8 +354,6 @@ function copy() {
         <Button variant="outline" @click="store.isOpenRightSlider = !store.isOpenRightSlider">
           <Settings class="size-4" />
         </Button>
-
-        <Toaster rich-colors position="top-center" />
       </div>
     </div>
 

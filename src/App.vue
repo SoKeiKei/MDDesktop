@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import CodemirrorEditor from '@/views/CodemirrorEditor.vue'
+import { Toaster } from 'vue-sonner'
 </script>
 
 <template>
   <CodemirrorEditor />
+  <Toaster position="top-center" richColors />
 </template>
 
 <style lang="less">

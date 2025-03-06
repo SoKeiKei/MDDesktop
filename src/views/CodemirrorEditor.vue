@@ -58,9 +58,16 @@ const fullPath = computed(() => {
   if (!basePath) return '未选择目录'
   
   if (filePath) {
-    // 如果有打开的文件，显示完整路径 + 文件名
-    const fileName = typeof filePath === 'string' ? filePath.split('/').pop() : ''
-    return `${basePath}${basePath.endsWith('/') ? '' : '/'}${fileName}`
+    // 修复 Windows 路径显示问题
+    if (typeof filePath === 'string') {
+      // 如果 filePath 是完整路径，只显示相对路径部分
+      if (filePath.startsWith(basePath)) {
+        return filePath
+      }
+      // 否则只取文件名
+      const fileName = filePath.split(/[/\\]/).pop()
+      return `${basePath}${basePath.endsWith('/') || basePath.endsWith('\\') ? '' : '/'}${fileName}`
+    }
   }
   
   // 否则只显示目录路径
