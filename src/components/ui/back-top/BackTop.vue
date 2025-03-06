@@ -19,9 +19,37 @@ const visible = ref(false)
 
 const target = ref<Target>(null)
 
+function smoothScrollToTop(element: HTMLElement | Window, duration = 300) {
+  const start = element instanceof Window ? window.scrollY : (element as HTMLElement).scrollTop
+  const startTime = performance.now()
+  
+  function scroll() {
+    const currentTime = performance.now()
+    const time = Math.min(1, (currentTime - startTime) / duration)
+    
+    // easeInOutQuad 缓动函数
+    const easedTime = time < 0.5 
+      ? 2 * time * time 
+      : -1 + (4 - 2 * time) * time
+    
+    if(element instanceof Window) {
+      window.scrollTo(0, start * (1 - easedTime))
+    } else {
+      (element as HTMLElement).scrollTop = start * (1 - easedTime)
+    }
+    
+    if(time < 1) {
+      requestAnimationFrame(scroll)
+    }
+  }
+  
+  requestAnimationFrame(scroll)
+}
+
 function scrollToTop(e: MouseEvent) {
-  console.log(`scrollToTop`)
-  target.value?.scrollTo({ top: 0, left: 0, behavior: `smooth` })
+  if(target.value) {
+    smoothScrollToTop(target.value)
+  }
   props.onClick?.(e)
 }
 

@@ -10,6 +10,14 @@ import {
 import fileApi from '@/utils/file'
 import CodeMirror from 'codemirror'
 import { useLocalDirectoryStore } from '@/stores/useLocalDirectoryStore'
+import { Button } from '@/components/ui/button'
+import { Smartphone, Monitor } from 'lucide-vue-next'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 const store = useStore()
 const displayStore = useDisplayStore()
@@ -384,6 +392,9 @@ onMounted(() => {
   onEditorRefresh()
   mdLocalToRemote()
 })
+
+// 阅览模式状态
+const isFullWidthPreview = ref(false)
 </script>
 
 <template>
@@ -445,13 +456,39 @@ onMounted(() => {
           ref="preview"
           class="preview-wrapper flex-1 p-5"
         >
-          <div id="output-wrapper" :class="{ output_night: !backLight }">
-            <div class="preview border-x-1 shadow-xl">
-              <section id="output" v-html="output" />
-              <div v-if="isCoping" class="loading-mask">
-                <div class="loading-mask-box">
-                  <div class="loading__img" />
-                  <span>正在生成</span>
+          <div class="relative w-full h-full">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    class="absolute right-2 top-2 z-10"
+                    @click="isFullWidthPreview = !isFullWidthPreview"
+                  >
+                    <Smartphone v-if="!isFullWidthPreview" class="h-4 w-4" />
+                    <Monitor v-else class="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{{ isFullWidthPreview ? '切换到移动端预览' : '切换到大屏预览' }}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <div id="output-wrapper" :class="{ output_night: !backLight }">
+              <div 
+                class="preview border-x-1 shadow-xl transition-all duration-200"
+                :style="{ 
+                  width: isFullWidthPreview ? '100%' : '375px',
+                  margin: '0 auto'
+                }"
+              >
+                <section id="output" v-html="output" />
+                <div v-if="isCoping" class="loading-mask">
+                  <div class="loading-mask-box">
+                    <div class="loading__img" />
+                    <span>正在生成</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -554,5 +591,16 @@ onMounted(() => {
 
 .codeMirror-wrapper {
   overflow-x: auto;
+}
+
+.preview {
+  position: relative;
+  margin: 0 auto;  // 居中显示
+  min-height: 100%;
+  padding: 20px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  word-wrap: break-word;
 }
 </style>
